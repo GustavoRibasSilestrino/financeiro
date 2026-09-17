@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Fraunces", "Iowan Old Style", serif;
+  --font-body: "Karla", "Segoe UI", sans-serif;
+
+  --color-paper: #f7f2e7;
+  --color-paper-soft: #efe8d8;
+  --color-card: #fffdf8;
+  --color-ink: #2c2420;
+  --color-ink-soft: #6b6156;
+  --color-ink-faint: #a89d8d;
+  --color-line: #ddd2ba;
+
+  --color-rust: #c1622d;
+  --color-rust-dark: #9c4a1f;
+  --color-rust-soft: #f1ddc9;
+
+  --color-sage: #55725a;
+  --color-sage-dark: #3d5641;
+  --color-sage-soft: #dfe6d5;
+
+  --color-brick: #a33f34;
+  --color-brick-soft: #f0d9d1;
+
+  --color-mustard: #c8912f;
+  --color-mustard-soft: #f2e2bd;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* subtle paper grain, layered under everything */
+.paper-texture {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* hand-drawn-ish squiggle underline for section headings */
+.squiggle {
+  display: block;
+  width: 64px;
+  height: 10px;
+  margin-top: 6px;
+}
+
+/* soft, warm shadow instead of default cool gray shadow */
+.shadow-warm {
+  box-shadow: 0 1px 2px rgba(44, 36, 32, 0.04), 0 8px 24px -8px rgba(44, 36, 32, 0.12);
+}
+
+.torn-edge {
+  clip-path: polygon(
+    0% 2%, 3% 0%, 8% 1.5%, 14% 0%, 20% 1.2%, 27% 0%, 34% 1.5%, 41% 0%, 48% 1%, 55% 0%,
+    62% 1.4%, 69% 0%, 76% 1.1%, 83% 0%, 90% 1.3%, 96% 0%, 100% 2%,
+    100% 98%, 96% 100%, 90% 98.7%, 83% 100%, 76% 98.9%, 69% 100%, 62% 98.6%, 55% 100%,
+    48% 99%, 41% 100%, 34% 98.5%, 27% 100%, 20% 98.8%, 14% 100%, 8% 98.5%, 3% 100%, 0% 98%
+  );
+}
+
+::selection {
+  background: var(--color-rust-soft);
+  color: var(--color-rust-dark);
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  appearance: textfield;
+}
+
+/* checkbox styled like a little wax stamp */
+.stamp-checkbox {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--color-line);
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.15s ease;
+}
+.stamp-checkbox:checked {
+  border-color: var(--color-sage);
+  background-color: var(--color-sage-soft);
+}
+.stamp-checkbox:checked::after {
+  content: "✓";
+  color: var(--color-sage-dark);
+  font-size: 13px;
+  font-weight: 700;
+}
