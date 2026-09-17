@@ -44,7 +44,7 @@ export function CalendarView({ currentKey, bills, onAdd, onRemove, onTogglePaid,
   const cells: (number | null)[] = [...Array(offset).fill(null), ...Array.from({ length: total }, (_, i) => i + 1)];
 
   return (
-    <section className="bg-card border border-line rounded-2xl shadow-warm p-8">
+    <section className="bg-card border border-line rounded-2xl shadow-warm p-5 sm:p-8">
       <p className="text-sm uppercase tracking-[0.14em] text-ink-faint">Calendário de contas</p>
       <p className="text-ink-soft text-sm mt-1">
         Arraste uma conta pra outro dia pra mudar o vencimento, ou clique num dia pra lançar uma nova.
@@ -128,16 +128,16 @@ export function CalendarView({ currentKey, bills, onAdd, onRemove, onTogglePaid,
                 <li className="text-ink-faint text-sm py-2">Nada vencendo nesse dia ainda.</li>
               )}
               {(billsByDay.get(selectedDay) ?? []).map((b) => (
-                <li key={b.id} className="flex items-center justify-between py-2 group">
-                  <div className="flex items-center gap-3">
+                <li key={b.id} className="flex flex-wrap items-center justify-between gap-2 py-2 group">
+                  <div className="flex items-center gap-3 min-w-0">
                     <input
                       type="checkbox"
-                      className="stamp-checkbox"
+                      className="stamp-checkbox shrink-0"
                       checked={b.paid}
                       onChange={() => onTogglePaid(b.id)}
                       aria-label="Marcar como paga"
                     />
-                    <span className={b.paid ? "line-through opacity-50" : ""}>{b.name}</span>
+                    <span className={`truncate ${b.paid ? "line-through opacity-50" : ""}`}>{b.name}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className={`tabular-nums text-ink-soft ${b.paid ? "opacity-50" : ""}`}>
@@ -159,7 +159,7 @@ export function CalendarView({ currentKey, bills, onAdd, onRemove, onTogglePaid,
                     </label>
                     <button
                       onClick={() => onRemove(b.id)}
-                      className="text-ink-faint opacity-50 group-hover:opacity-100 hover:text-brick transition-opacity cursor-pointer"
+                      className="text-ink-faint opacity-50 group-hover:opacity-100 hover:text-brick transition-opacity cursor-pointer p-1.5 -m-1.5 text-lg leading-none"
                       aria-label="Remover"
                     >
                       ×

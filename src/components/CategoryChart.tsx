@@ -20,7 +20,7 @@ export function CategoryChart({ data }: Props) {
   const total = data.reduce((s, d) => s + d.amount, 0);
 
   return (
-    <section className="bg-card border border-line rounded-2xl shadow-warm p-8">
+    <section className="bg-card border border-line rounded-2xl shadow-warm p-6 sm:p-8">
       <p className="text-sm uppercase tracking-[0.14em] text-ink-faint">Pra onde foi o dinheiro</p>
       <p className="text-ink-soft text-sm mt-1">Gastos, faturas e dívidas deste mês</p>
 

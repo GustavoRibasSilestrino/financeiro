@@ -15,7 +15,7 @@ export function Ledger({ month, previousBalance }: Props) {
   const delta = previousBalance !== null ? bal - previousBalance : null;
 
   return (
-    <section className="bg-card border border-line rounded-2xl shadow-warm p-8 sm:p-10 relative overflow-hidden">
+    <section className="bg-card border border-line rounded-2xl shadow-warm p-6 sm:p-10 relative overflow-hidden">
       <div
         aria-hidden
         className="absolute -right-10 -top-10 w-48 h-48 rounded-full opacity-40"
@@ -39,12 +39,12 @@ export function Ledger({ month, previousBalance }: Props) {
         </p>
       )}
 
-      <div className="mt-8 grid grid-cols-2 sm:grid-cols-2 gap-6 relative">
-        <div className="border-t border-dashed border-line pt-3">
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 relative">
+        <div className="border-t border-dashed border-line pt-3 min-w-0">
           <p className="text-xs uppercase tracking-wide text-ink-faint">Entra</p>
           <p className="font-display text-2xl mt-1 text-sage-dark">{formatBRL(income)}</p>
         </div>
-        <div className="border-t border-dashed border-line pt-3">
+        <div className="border-t border-dashed border-line pt-3 min-w-0">
           <p className="text-xs uppercase tracking-wide text-ink-faint">Sai (gastos + faturas + dívidas)</p>
           <p className="font-display text-2xl mt-1 text-brick">{formatBRL(out)}</p>
         </div>

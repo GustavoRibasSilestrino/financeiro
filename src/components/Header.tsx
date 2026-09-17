@@ -21,17 +21,17 @@ export function Header({ currentKey, onChange }: Props) {
       <div className="flex items-center gap-1 bg-card border border-line rounded-full px-2 py-2 shadow-warm">
         <button
           onClick={() => onChange(shiftMonthKey(currentKey, -1))}
-          className="w-8 h-8 rounded-full grid place-content-center text-ink-soft hover:bg-paper-soft hover:text-ink transition-colors cursor-pointer"
+          className="w-10 h-10 shrink-0 rounded-full grid place-content-center text-ink-soft hover:bg-paper-soft hover:text-ink transition-colors cursor-pointer text-lg"
           aria-label="Mês anterior"
         >
           ‹
         </button>
-        <span className="font-display text-lg px-3 min-w-[170px] text-center">
+        <span className="font-display text-base sm:text-lg px-1 sm:px-3 min-w-[140px] sm:min-w-[170px] text-center">
           {labelForMonthKey(currentKey)}
         </span>
         <button
           onClick={() => onChange(shiftMonthKey(currentKey, 1))}
-          className="w-8 h-8 rounded-full grid place-content-center text-ink-soft hover:bg-paper-soft hover:text-ink transition-colors cursor-pointer"
+          className="w-10 h-10 shrink-0 rounded-full grid place-content-center text-ink-soft hover:bg-paper-soft hover:text-ink transition-colors cursor-pointer text-lg"
           aria-label="Próximo mês"
         >
           ›

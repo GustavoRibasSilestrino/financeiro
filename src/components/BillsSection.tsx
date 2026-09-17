@@ -28,7 +28,7 @@ export function BillsSection({ bills, onAdd, onRemove, onTogglePaid }: Props) {
   }
 
   return (
-    <section className="bg-card border border-line rounded-2xl shadow-warm p-8">
+    <section className="bg-card border border-line rounded-2xl shadow-warm p-6 sm:p-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
           <p className="text-sm uppercase tracking-[0.14em] text-ink-faint">Faturas e contas</p>
@@ -81,17 +81,17 @@ export function BillsSection({ bills, onAdd, onRemove, onTogglePaid }: Props) {
       <ul className="mt-6 divide-y divide-dashed divide-line">
         {bills.length === 0 && <li className="text-ink-faint text-sm py-4">Nenhuma fatura por aqui.</li>}
         {bills.map((b) => (
-          <li key={b.id} className="flex items-center justify-between py-3 group">
-            <div className="flex items-center gap-3">
+          <li key={b.id} className="flex flex-wrap items-center justify-between gap-2 py-3 group">
+            <div className="flex items-center gap-3 min-w-0">
               <input
                 type="checkbox"
-                className="stamp-checkbox"
+                className="stamp-checkbox shrink-0"
                 checked={b.paid}
                 onChange={() => onTogglePaid(b.id)}
                 aria-label="Marcar como paga"
               />
-              <div className={b.paid ? "opacity-50" : ""}>
-                <p className={b.paid ? "line-through" : ""}>{b.name}</p>
+              <div className={`min-w-0 ${b.paid ? "opacity-50" : ""}`}>
+                <p className={`truncate ${b.paid ? "line-through" : ""}`}>{b.name}</p>
                 <p className="text-[11px] text-ink-faint">vence dia {b.dueDay}</p>
               </div>
             </div>
@@ -101,7 +101,7 @@ export function BillsSection({ bills, onAdd, onRemove, onTogglePaid }: Props) {
               </span>
               <button
                 onClick={() => onRemove(b.id)}
-                className="text-ink-faint opacity-50 group-hover:opacity-100 hover:text-brick transition-opacity cursor-pointer"
+                className="text-ink-faint opacity-50 group-hover:opacity-100 hover:text-brick transition-opacity cursor-pointer p-1.5 -m-1.5 text-lg leading-none"
                 aria-label="Remover"
               >
                 ×

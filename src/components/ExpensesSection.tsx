@@ -26,7 +26,7 @@ export function ExpensesSection({ expenses, onAdd, onRemove }: Props) {
   }
 
   return (
-    <section className="bg-card border border-line rounded-2xl shadow-warm p-8">
+    <section className="bg-card border border-line rounded-2xl shadow-warm p-6 sm:p-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
           <p className="text-sm uppercase tracking-[0.14em] text-ink-faint">Gastos do mês</p>
@@ -119,7 +119,7 @@ export function ExpensesSection({ expenses, onAdd, onRemove }: Props) {
               <span className="tabular-nums text-ink-soft">{formatBRL(e.amount)}</span>
               <button
                 onClick={() => onRemove(e.id)}
-                className="text-ink-faint opacity-50 group-hover:opacity-100 hover:text-brick transition-opacity cursor-pointer"
+                className="text-ink-faint opacity-50 group-hover:opacity-100 hover:text-brick transition-opacity cursor-pointer p-1.5 -m-1.5 text-lg leading-none"
                 aria-label="Remover"
               >
                 ×

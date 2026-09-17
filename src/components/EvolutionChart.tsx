@@ -23,7 +23,7 @@ interface Props {
 
 export function EvolutionChart({ data }: Props) {
   return (
-    <section className="bg-card border border-line rounded-2xl shadow-warm p-8">
+    <section className="bg-card border border-line rounded-2xl shadow-warm p-6 sm:p-8">
       <p className="text-sm uppercase tracking-[0.14em] text-ink-faint">Sua evolução</p>
       <p className="text-ink-soft text-sm mt-1">Quanto sobrou (ou faltou) em cada mês</p>
 

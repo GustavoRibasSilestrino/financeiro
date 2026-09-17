@@ -30,7 +30,7 @@ export function GoalTracker({ month, onSetGoal }: Props) {
   }
 
   return (
-    <section className="bg-card border border-line rounded-2xl shadow-warm p-8 flex flex-col">
+    <section className="bg-card border border-line rounded-2xl shadow-warm p-6 sm:p-8 flex flex-col">
       <div className="flex items-center justify-between">
         <p className="text-sm uppercase tracking-[0.14em] text-ink-faint">Meta do mês</p>
         {!editing && (

@@ -35,7 +35,7 @@ export function DebtsSection({ debts, onAdd, onRemove, onAdvance }: Props) {
   }
 
   return (
-    <section className="bg-card border border-line rounded-2xl shadow-warm p-8">
+    <section className="bg-card border border-line rounded-2xl shadow-warm p-6 sm:p-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
           <p className="text-sm uppercase tracking-[0.14em] text-ink-faint">Dívidas e parcelamentos</p>
@@ -90,9 +90,9 @@ export function DebtsSection({ debts, onAdd, onRemove, onAdvance }: Props) {
         {debts.map((d) => {
           const done = d.paidInstallments >= d.totalInstallments;
           return (
-            <li key={d.id} className="flex items-center justify-between py-3 group">
-              <div className={done ? "opacity-50" : ""}>
-                <p className={done ? "line-through" : ""}>{d.name}</p>
+            <li key={d.id} className="flex flex-wrap items-center justify-between gap-2 py-3 group">
+              <div className={`min-w-0 ${done ? "opacity-50" : ""}`}>
+                <p className={`truncate ${done ? "line-through" : ""}`}>{d.name}</p>
                 <p className="text-[11px] text-ink-faint">
                   {d.paidInstallments}/{d.totalInstallments} parcelas pagas
                 </p>
@@ -111,7 +111,7 @@ export function DebtsSection({ debts, onAdd, onRemove, onAdvance }: Props) {
                 )}
                 <button
                   onClick={() => onRemove(d.id)}
-                  className="text-ink-faint opacity-50 group-hover:opacity-100 hover:text-brick transition-opacity cursor-pointer"
+                  className="text-ink-faint opacity-50 group-hover:opacity-100 hover:text-brick transition-opacity cursor-pointer p-1.5 -m-1.5 text-lg leading-none"
                   aria-label="Remover"
                 >
                   ×

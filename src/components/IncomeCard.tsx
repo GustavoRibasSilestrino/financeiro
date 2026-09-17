@@ -24,16 +24,16 @@ export function IncomeCard({ month, onChange }: Props) {
   }
 
   return (
-    <section className="bg-card border border-line rounded-2xl shadow-warm p-8">
+    <section className="bg-card border border-line rounded-2xl shadow-warm p-6 sm:p-8">
       <p className="text-sm uppercase tracking-[0.14em] text-ink-faint">Quanto entra</p>
 
-      <div className="mt-4 grid grid-cols-2 gap-6">
-        <div>
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+        <div className="min-w-0">
           <label className="text-sm text-ink-soft">Salário / renda fixa</label>
           <div className="flex items-baseline gap-1.5 mt-1 border-b border-line focus-within:border-rust">
             <span className="text-ink-faint text-sm">R$</span>
             <input
-              className="font-display text-2xl bg-transparent outline-none w-full py-1"
+              className="font-display text-2xl bg-transparent outline-none w-full min-w-0 py-1"
               value={income}
               inputMode="decimal"
               placeholder="0"
@@ -42,12 +42,12 @@ export function IncomeCard({ month, onChange }: Props) {
             />
           </div>
         </div>
-        <div>
+        <div className="min-w-0">
           <label className="text-sm text-ink-soft">Extras (bicos, bônus...)</label>
           <div className="flex items-baseline gap-1.5 mt-1 border-b border-line focus-within:border-rust">
             <span className="text-ink-faint text-sm">R$</span>
             <input
-              className="font-display text-2xl bg-transparent outline-none w-full py-1"
+              className="font-display text-2xl bg-transparent outline-none w-full min-w-0 py-1"
               value={extra}
               inputMode="decimal"
               placeholder="0"
