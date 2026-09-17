@@ -43,3 +43,13 @@ export function shortLabelForMonthKey(key: string): string {
 export function getMonth(store: Store, key: string): MonthData {
   return store[key] ?? emptyMonth();
 }
+
+export function daysInMonth(key: string): number {
+  const [y, m] = key.split("-").map(Number);
+  return new Date(y, m, 0).getDate();
+}
+
+export function firstWeekdayOfMonth(key: string): number {
+  const [y, m] = key.split("-").map(Number);
+  return new Date(y, m - 1, 1).getDay();
+}
