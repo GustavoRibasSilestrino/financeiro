@@ -1,30 +1,30 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Fraunces", "Iowan Old Style", serif;
-  --font-body: "Karla", "Segoe UI", sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
 
-  --color-paper: #f7f2e7;
-  --color-paper-soft: #efe8d8;
-  --color-card: #fffdf8;
-  --color-ink: #2c2420;
-  --color-ink-soft: #6b6156;
-  --color-ink-faint: #a89d8d;
-  --color-line: #ddd2ba;
+  --color-paper: #f4f5fb;
+  --color-paper-soft: #e9ebf6;
+  --color-card: #ffffff;
+  --color-ink: #151933;
+  --color-ink-soft: #5b6180;
+  --color-ink-faint: #9298b3;
+  --color-line: #e2e5f1;
 
-  --color-rust: #c1622d;
-  --color-rust-dark: #9c4a1f;
-  --color-rust-soft: #f1ddc9;
+  --color-rust: #6d5dfc;
+  --color-rust-dark: #4a3bd6;
+  --color-rust-soft: #e9e6ff;
 
-  --color-sage: #55725a;
-  --color-sage-dark: #3d5641;
-  --color-sage-soft: #dfe6d5;
+  --color-sage: #10b981;
+  --color-sage-dark: #059669;
+  --color-sage-soft: #d9f5ea;
 
-  --color-brick: #a33f34;
-  --color-brick-soft: #f0d9d1;
+  --color-brick: #ef4468;
+  --color-brick-soft: #fde1e8;
 
-  --color-mustard: #c8912f;
-  --color-mustard-soft: #f2e2bd;
+  --color-mustard: #f59e0b;
+  --color-mustard-soft: #fdefc9;
 }
 
 html {
@@ -33,20 +33,18 @@ html {
 
 body {
   font-family: var(--font-body);
+  background-image:
+    radial-gradient(60rem 30rem at 85% -10%, #e4e0ff 0%, transparent 60%),
+    radial-gradient(45rem 25rem at -10% 0%, #d9f5ea 0%, transparent 55%);
+  background-attachment: fixed;
   background-color: var(--color-paper);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
 }
 
-/* subtle paper grain, layered under everything */
-.paper-texture {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.5;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
-}
+.paper-texture { display: none; }
 
 .font-display {
   font-family: var(--font-display);
@@ -62,7 +60,7 @@ body {
 
 /* soft, warm shadow instead of default cool gray shadow */
 .shadow-warm {
-  box-shadow: 0 1px 2px rgba(44, 36, 32, 0.04), 0 8px 24px -8px rgba(44, 36, 32, 0.12);
+  box-shadow: 0 1px 2px rgba(21, 25, 51, 0.04), 0 12px 32px -12px rgba(60, 50, 160, 0.18);
 }
 
 .torn-edge {
@@ -110,4 +108,14 @@ input[type="number"] {
   color: var(--color-sage-dark);
   font-size: 13px;
   font-weight: 700;
+}
+
+/* mobile: 16px inputs avoid iOS zoom-on-focus, comfortable touch targets */
+@media (max-width: 639px) {
+  input, select, textarea { font-size: 16px; }
+}
+
+.hero-card {
+  background: linear-gradient(135deg, #5b4bf0 0%, #7d5cff 55%, #a37bff 100%);
+  color: #fff;
 }

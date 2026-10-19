@@ -2,14 +2,14 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { formatBRL, type CategorySlice } from "../lib/finance";
 
 const PALETTE = [
-  "#c1622d",
-  "#55725a",
-  "#c8912f",
-  "#a33f34",
-  "#8a7a9c",
-  "#4f7d8c",
-  "#b98d5e",
-  "#7c8a5e",
+  "#6d5dfc",
+  "#10b981",
+  "#f59e0b",
+  "#ef4468",
+  "#a37bff",
+  "#0ea5e9",
+  "#f97316",
+  "#14b8a6",
 ];
 
 interface Props {
@@ -20,7 +20,7 @@ export function CategoryChart({ data }: Props) {
   const total = data.reduce((s, d) => s + d.amount, 0);
 
   return (
-    <section className="bg-card border border-line rounded-2xl shadow-warm p-6 sm:p-8">
+    <section className="bg-card border border-line rounded-3xl shadow-warm p-5 sm:p-8">
       <p className="text-sm uppercase tracking-[0.14em] text-ink-faint">Pra onde foi o dinheiro</p>
       <p className="text-ink-soft text-sm mt-1">Gastos, faturas e dívidas deste mês</p>
 
@@ -38,7 +38,7 @@ export function CategoryChart({ data }: Props) {
                   innerRadius={45}
                   outerRadius={70}
                   paddingAngle={2}
-                  stroke="#f7f2e7"
+                  stroke="#ffffff"
                   strokeWidth={2}
                 >
                   {data.map((_, i) => (

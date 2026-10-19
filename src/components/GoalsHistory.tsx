@@ -15,7 +15,7 @@ export function GoalsHistory({ data }: Props) {
   const withGoal = data.filter((d) => d.goal > 0);
 
   return (
-    <section className="bg-card border border-line rounded-2xl shadow-warm p-6 sm:p-8">
+    <section className="bg-card border border-line rounded-3xl shadow-warm p-5 sm:p-8">
       <p className="text-sm uppercase tracking-[0.14em] text-ink-faint">Histórico de metas</p>
       <p className="text-ink-soft text-sm mt-1">Como você foi nos últimos meses</p>
 
@@ -41,7 +41,7 @@ export function GoalsHistory({ data }: Props) {
                     className="h-full rounded-full"
                     style={{
                       width: `${Math.min(Math.max(pct, 3), 100)}%`,
-                      background: hit ? "#55725a" : "#c8912f",
+                      background: hit ? "#10b981" : "#f59e0b",
                     }}
                   />
                 </div>

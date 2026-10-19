@@ -1,0 +1,11 @@
+{
+  "name": "Ninho — suas finanças",
+  "short_name": "Ninho",
+  "description": "Seu dinheiro, organizado do seu jeito.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f5fb",
+  "theme_color": "#5b4bf0",
+  "lang": "pt-BR",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

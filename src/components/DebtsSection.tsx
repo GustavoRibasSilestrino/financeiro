@@ -35,7 +35,7 @@ export function DebtsSection({ debts, onAdd, onRemove, onAdvance }: Props) {
   }
 
   return (
-    <section className="bg-card border border-line rounded-2xl shadow-warm p-6 sm:p-8">
+    <section className="bg-card border border-line rounded-3xl shadow-warm p-5 sm:p-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
           <p className="text-sm uppercase tracking-[0.14em] text-ink-faint">Dívidas e parcelamentos</p>

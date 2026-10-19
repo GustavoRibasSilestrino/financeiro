@@ -44,7 +44,7 @@ export function CalendarView({ currentKey, bills, onAdd, onRemove, onTogglePaid,
   const cells: (number | null)[] = [...Array(offset).fill(null), ...Array.from({ length: total }, (_, i) => i + 1)];
 
   return (
-    <section className="bg-card border border-line rounded-2xl shadow-warm p-5 sm:p-8">
+    <section className="bg-card border border-line rounded-3xl shadow-warm p-5 sm:p-8">
       <p className="text-sm uppercase tracking-[0.14em] text-ink-faint">Calendário de contas</p>
       <p className="text-ink-soft text-sm mt-1">
         Arraste uma conta pra outro dia pra mudar o vencimento, ou clique num dia pra lançar uma nova.

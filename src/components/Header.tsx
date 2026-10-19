@@ -7,31 +7,26 @@ interface Props {
 
 export function Header({ currentKey, onChange }: Props) {
   return (
-    <header className="flex flex-wrap items-end justify-between gap-6 pb-8 border-b border-line/70">
-      <div>
-        <p className="text-sm text-ink-soft tracking-wide">{today()}</p>
-        <h1 className="font-display text-4xl sm:text-5xl mt-1">
-          Ninho
-        </h1>
-        <p className="text-ink-soft mt-2 max-w-md">
-          Um cantinho pra organizar o que entra, o que sai, e o que sobra pra você guardar.
-        </p>
+    <header className="flex items-center justify-between gap-3">
+      <div className="min-w-0">
+        <p className="text-xs sm:text-sm text-ink-soft">{today()}</p>
+        <h1 className="font-display font-extrabold text-2xl sm:text-4xl tracking-tight">Ninho</h1>
       </div>
 
-      <div className="flex items-center gap-1 bg-card border border-line rounded-full px-2 py-2 shadow-warm">
+      <div className="flex items-center bg-card border border-line rounded-full p-1 shadow-warm shrink-0">
         <button
           onClick={() => onChange(shiftMonthKey(currentKey, -1))}
-          className="w-10 h-10 shrink-0 rounded-full grid place-content-center text-ink-soft hover:bg-paper-soft hover:text-ink transition-colors cursor-pointer text-lg"
+          className="w-10 h-10 shrink-0 rounded-full grid place-content-center text-ink-soft hover:bg-paper-soft hover:text-ink active:bg-paper-soft transition-colors cursor-pointer text-lg"
           aria-label="Mês anterior"
         >
           ‹
         </button>
-        <span className="font-display text-base sm:text-lg px-1 sm:px-3 min-w-[140px] sm:min-w-[170px] text-center">
+        <span className="font-display font-semibold text-sm sm:text-base px-1 sm:px-3 min-w-[104px] sm:min-w-[150px] text-center first-letter:uppercase">
           {labelForMonthKey(currentKey)}
         </span>
         <button
           onClick={() => onChange(shiftMonthKey(currentKey, 1))}
-          className="w-10 h-10 shrink-0 rounded-full grid place-content-center text-ink-soft hover:bg-paper-soft hover:text-ink transition-colors cursor-pointer text-lg"
+          className="w-10 h-10 shrink-0 rounded-full grid place-content-center text-ink-soft hover:bg-paper-soft hover:text-ink active:bg-paper-soft transition-colors cursor-pointer text-lg"
           aria-label="Próximo mês"
         >
           ›

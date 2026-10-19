@@ -41,11 +41,11 @@ function App() {
   return (
     <div className="min-h-screen relative">
       <div className="paper-texture" aria-hidden />
-      <div className="max-w-5xl mx-auto px-5 sm:px-8 py-10 sm:py-14 relative z-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-8 pt-[max(1.25rem,env(safe-area-inset-top))] sm:pt-12 pb-28 sm:pb-14 relative z-10">
         <Header currentKey={currentKey} onChange={setCurrentKey} />
         <NavTabs active={tab} onChange={setTab} />
 
-        <main className="mt-8 space-y-6">
+        <main className="mt-5 sm:mt-8 space-y-4 sm:space-y-6">
           {tab === "resumo" && (
             <>
               <Ledger month={month} previousBalance={previousBalance} />
@@ -74,7 +74,7 @@ function App() {
                 }
               />
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 <BillsSection
                   bills={month.bills}
                   onAdd={(bill: Bill) => updateMonth((m) => ({ ...m, bills: [...m.bills, bill] }))}
@@ -129,7 +129,7 @@ function App() {
           )}
         </main>
 
-        <footer className="mt-14 pt-6 border-t border-line/70 text-center text-xs text-ink-faint">
+        <footer className="mt-10 pt-6 border-t border-line/70 text-center text-xs text-ink-faint">
           Seus dados ficam só neste navegador — nada é enviado pra lugar nenhum.
         </footer>
       </div>

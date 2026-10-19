@@ -24,7 +24,7 @@ export function IncomeCard({ month, onChange }: Props) {
   }
 
   return (
-    <section className="bg-card border border-line rounded-2xl shadow-warm p-6 sm:p-8">
+    <section className="bg-card border border-line rounded-3xl shadow-warm p-5 sm:p-8">
       <p className="text-sm uppercase tracking-[0.14em] text-ink-faint">Quanto entra</p>
 
       <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
