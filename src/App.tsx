@@ -11,6 +11,7 @@ import { Header } from "./components/Header";
 import { IncomeCard } from "./components/IncomeCard";
 import { Ledger } from "./components/Ledger";
 import { MonthNote } from "./components/MonthNote";
+import { SpendingBar } from "./components/SpendingBar";
 import { NavTabs, type TabId } from "./components/NavTabs";
 import { useStore } from "./hooks/useStore";
 import { balance, expensesByCategory } from "./lib/finance";
@@ -49,6 +50,7 @@ function App() {
           {tab === "resumo" && (
             <>
               <Ledger month={month} previousBalance={previousBalance} />
+              <SpendingBar month={month} />
               <IncomeCard
                 month={month}
                 onChange={(income, extraIncome) => updateMonth((m) => ({ ...m, income, extraIncome }))}
