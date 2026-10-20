@@ -19,6 +19,8 @@ export const CATEGORIES: Category[] = [
   "Outros",
 ];
 
+export type CategoryLimits = Partial<Record<Category, number>>;
+
 export interface Expense {
   id: string;
   name: string;
@@ -48,6 +50,7 @@ export interface MonthData {
   extraIncome: number;
   goal: number;
   note: string;
+  categoryLimits?: CategoryLimits;
   expenses: Expense[];
   bills: Bill[];
   debts: Debt[];

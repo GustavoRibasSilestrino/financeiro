@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { CategoryBudgets } from "./components/CategoryBudgets";
 import { BillsSection } from "./components/BillsSection";
 import { CalendarView } from "./components/CalendarView";
 import { CategoryChart } from "./components/CategoryChart";
@@ -15,7 +16,7 @@ import { SpendingBar } from "./components/SpendingBar";
 import { NavTabs, type TabId } from "./components/NavTabs";
 import { useStore } from "./hooks/useStore";
 import { balance, expensesByCategory } from "./lib/finance";
-import { getMonth, shiftMonthKey, shortLabelForMonthKey } from "./lib/storage";
+import { effectiveCategoryLimits, getMonth, shiftMonthKey, shortLabelForMonthKey } from "./lib/storage";
 import type { Bill, Debt, Expense } from "./lib/types";
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
     history.push({ key, label: shortLabelForMonthKey(key), balance: balance(m), goal: m.goal });
   }
 
+  const categoryLimits = effectiveCategoryLimits(store, currentKey);
   const categories = expensesByCategory(month);
 
   function setBillDueDay(id: string, day: number) {
@@ -68,6 +70,18 @@ function App() {
 
           {tab === "gastos" && (
             <>
+              <CategoryBudgets
+                expenses={month.expenses}
+                limits={categoryLimits}
+                onSetLimit={(category, value) =>
+                  updateMonth((m) => {
+                    const next = { ...categoryLimits };
+                    if (value > 0) next[category] = value;
+                    else delete next[category];
+                    return { ...m, categoryLimits: next };
+                  })
+                }
+              />
               <ExpensesSection
                 expenses={month.expenses}
                 onAdd={(expense: Expense) => updateMonth((m) => ({ ...m, expenses: [...m.expenses, expense] }))}

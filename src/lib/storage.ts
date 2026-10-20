@@ -1,4 +1,4 @@
-import { emptyMonth, type MonthData, type Store } from "./types";
+import { emptyMonth, type CategoryLimits, type MonthData, type Store } from "./types";
 
 const STORAGE_KEY = "ninho.store.v1";
 
@@ -52,4 +52,13 @@ export function daysInMonth(key: string): number {
 export function firstWeekdayOfMonth(key: string): number {
   const [y, m] = key.split("-").map(Number);
   return new Date(y, m - 1, 1).getDay();
+}
+
+/** Limits set for this month, or inherited from the most recent earlier month that has any. */
+export function effectiveCategoryLimits(store: Store, key: string): CategoryLimits {
+  for (let i = 0; i <= 24; i++) {
+    const limits = store[shiftMonthKey(key, -i)]?.categoryLimits;
+    if (limits && Object.keys(limits).length > 0) return limits;
+  }
+  return {};
 }
