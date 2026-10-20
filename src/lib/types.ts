@@ -31,6 +31,31 @@ export interface Expense {
   date?: string;
   tags?: string[];
   note?: string;
+  /** Part of a weekly series; occurrences share the id and are regenerated every month. */
+  weeklyGroup?: string;
+  /** Split with other people: what was paid in total and among how many (amount is only my share). */
+  splitTotal?: number;
+  splitPeople?: number;
+  /** Others already paid me back their share. */
+  received?: boolean;
+  /** A photo of the receipt is stored on this device (IndexedDB), keyed by the expense id. */
+  hasReceipt?: boolean;
+}
+
+export interface Objective {
+  id: string;
+  name: string;
+  target: number;
+  saved: number;
+  /** Month (YYYY-MM) the goal should be reached by. */
+  deadline?: string;
+}
+
+export interface MonthClosing {
+  /** Where the leftover went: "reserve" or an objective id. */
+  to: string;
+  toName: string;
+  moved: number;
 }
 
 export interface IncomeSource {
@@ -78,6 +103,9 @@ export interface MonthData {
   categoryLimits?: CategoryLimits;
   /** Extra income sources beyond the two fixed fields above. */
   incomes?: IncomeSource[];
+  /** Savings goals with a name and a target; carried forward like category limits. */
+  objectives?: Objective[];
+  closing?: MonthClosing;
   /** Emergency fund: amount saved so far and target in months of spending. Carried forward like category limits. */
   reserveSaved?: number;
   reserveMonths?: number;

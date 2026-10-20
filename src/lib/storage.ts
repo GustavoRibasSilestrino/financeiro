@@ -1,4 +1,4 @@
-import { emptyMonth, type CategoryLimits, type MonthData, type Store } from "./types";
+import { emptyMonth, type CategoryLimits, type MonthData, type Objective, type Store } from "./types";
 
 const STORAGE_KEY = "ninho.store.v1";
 
@@ -83,4 +83,13 @@ export function effectiveReserve(store: Store, key: string): { saved: number; mo
     if (months === undefined && m?.reserveMonths !== undefined) months = m.reserveMonths;
   }
   return { saved: saved ?? 0, months: months ?? 6 };
+}
+
+/** Savings goals as last saved in this month or the closest earlier one. */
+export function effectiveObjectives(store: Store, key: string): Objective[] {
+  for (let i = 0; i <= 24; i++) {
+    const list = store[shiftMonthKey(key, -i)]?.objectives;
+    if (list) return list;
+  }
+  return [];
 }

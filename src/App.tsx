@@ -12,6 +12,8 @@ import { ReserveTracker } from "./components/ReserveTracker";
 import { IncomeSources } from "./components/IncomeSources";
 import { NotificationSettings } from "./components/NotificationSettings";
 import { SubscriptionsCard } from "./components/SubscriptionsCard";
+import { ObjectivesSection } from "./components/ObjectivesSection";
+import { MonthClose } from "./components/MonthClose";
 import { LockScreen } from "./components/LockScreen";
 import { PinSettings } from "./components/PinSettings";
 import { DailyBudget } from "./components/DailyBudget";
@@ -35,7 +37,7 @@ import { hasPin } from "./lib/pin";
 import { countableMonth } from "./lib/debts";
 import { mergeFromPrevious, previousMonthWithData } from "./lib/recurring";
 import { balance, expensesByCategory, itemsByCategory, totalIncome, totalOut } from "./lib/finance";
-import { monthKey, effectiveCategoryLimits, effectiveReserve, labelForMonthKey, getMonth, shiftMonthKey, shortLabelForMonthKey } from "./lib/storage";
+import { monthKey, effectiveCategoryLimits, effectiveObjectives, effectiveReserve, labelForMonthKey, getMonth, shiftMonthKey, shortLabelForMonthKey } from "./lib/storage";
 import type { Bill, Debt, Expense } from "./lib/types";
 
 function App() {
@@ -68,6 +70,7 @@ function App() {
 
   const categoryLimits = effectiveCategoryLimits(store, currentKey);
   const reserve = effectiveReserve(store, currentKey);
+  const objectives = effectiveObjectives(store, currentKey);
   const spentMonths = history.filter((h) => h.spent > 0);
   const avgSpend = spentMonths.length ? spentMonths.reduce((s, h) => s + h.spent, 0) / spentMonths.length : 0;
   const recent = history.filter((h) => h.income > 0).slice(-3);
@@ -78,6 +81,40 @@ function App() {
   const calc = countableMonth(month, currentKey);
   const categories = expensesByCategory(calc);
   const previousCategories = previousMonth ? expensesByCategory(countableMonth(previousMonth, previousKey)) : [];
+
+  function closeMonth(to: string, amount: number) {
+    updateMonth((m) => {
+      if (to === "reserve") {
+        return {
+          ...m,
+          reserveSaved: Math.round((reserve.saved + amount) * 100) / 100,
+          reserveMonths: reserve.months,
+          closing: { to, toName: "a reserva de emergência", moved: amount },
+        };
+      }
+      const target = objectives.find((o) => o.id === to);
+      return {
+        ...m,
+        objectives: objectives.map((o) => (o.id === to ? { ...o, saved: Math.round((o.saved + amount) * 100) / 100 } : o)),
+        closing: { to, toName: target ? `o objetivo "${target.name}"` : "um objetivo", moved: amount },
+      };
+    });
+  }
+
+  function reopenMonth() {
+    updateMonth((m) => {
+      const c = m.closing;
+      if (!c) return m;
+      const next = { ...m, closing: undefined };
+      if (c.to === "reserve") {
+        return { ...next, reserveSaved: Math.max(Math.round((reserve.saved - c.moved) * 100) / 100, 0), reserveMonths: reserve.months };
+      }
+      return {
+        ...next,
+        objectives: objectives.map((o) => (o.id === c.to ? { ...o, saved: Math.max(Math.round((o.saved - c.moved) * 100) / 100, 0) } : o)),
+      };
+    });
+  }
 
   function setBillDueDay(id: string, day: number) {
     updateMonth((m) => ({ ...m, bills: m.bills.map((b) => (b.id === id ? { ...b, dueDay: day } : b)) }));
@@ -119,6 +156,15 @@ function App() {
                 onChange={(income, extraIncome) => updateMonth((m) => ({ ...m, income, extraIncome }))}
               />
               <IncomeSources incomes={month.incomes ?? []} onChange={(incomes) => updateMonth((m) => ({ ...m, incomes }))} />
+              {!monthIsEmpty && (
+                <MonthClose
+                  month={month}
+                  balance={balance(calc)}
+                  objectives={objectives}
+                  onClose={closeMonth}
+                  onReopen={reopenMonth}
+                />
+              )}
               <MonthNote note={month.note} onChange={(note) => updateMonth((m) => ({ ...m, note }))} />
               <DataTools store={store} onImport={replaceStore} />
               <NotificationSettings />
@@ -135,6 +181,11 @@ function App() {
                 avgSpend={avgSpend}
                 avgSaving={avgSaving}
                 onChange={(saved, months) => updateMonth((m) => ({ ...m, reserveSaved: saved, reserveMonths: months }))}
+              />
+              <ObjectivesSection
+                objectives={objectives}
+                currentKey={currentKey}
+                onChange={(list) => updateMonth((m) => ({ ...m, objectives: list }))}
               />
               <GoalsHistory data={[...history].reverse()} />
             </>
