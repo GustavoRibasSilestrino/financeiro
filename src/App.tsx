@@ -13,6 +13,7 @@ import { IncomeSources } from "./components/IncomeSources";
 import { NotificationSettings } from "./components/NotificationSettings";
 import { SubscriptionsCard } from "./components/SubscriptionsCard";
 import { ObjectivesSection } from "./components/ObjectivesSection";
+import { LimitAlerts } from "./components/LimitAlerts";
 import { MonthClose } from "./components/MonthClose";
 import { LockScreen } from "./components/LockScreen";
 import { PinSettings } from "./components/PinSettings";
@@ -32,7 +33,8 @@ import { MonthNote } from "./components/MonthNote";
 import { SpendingBar } from "./components/SpendingBar";
 import { NavTabs, type TabId } from "./components/NavTabs";
 import { useStore } from "./hooks/useStore";
-import { notifyDueBills } from "./lib/notify";
+import { limitAlerts } from "./lib/limits";
+import { notifyDueBills, notifyLimits } from "./lib/notify";
 import { hasPin } from "./lib/pin";
 import { countableMonth } from "./lib/debts";
 import { mergeFromPrevious, previousMonthWithData } from "./lib/recurring";
@@ -122,14 +124,20 @@ function App() {
 
   // due-bill reminders: when bills change and whenever the app comes back to the foreground
   const bills = month.bills;
+  const expenses = month.expenses;
   const todayKey = monthKey(new Date());
   useEffect(() => {
     if (locked || currentKey !== todayKey) return;
-    void notifyDueBills(bills);
-    const onVisible = () => !document.hidden && void notifyDueBills(bills);
+    // one after the other: both read and rewrite the same "already sent today" list
+    const run = async () => {
+      await notifyDueBills(bills);
+      await notifyLimits(limitAlerts(expenses, categoryLimits));
+    };
+    void run();
+    const onVisible = () => !document.hidden && void run();
     document.addEventListener("visibilitychange", onVisible);
     return () => document.removeEventListener("visibilitychange", onVisible);
-  }, [bills, locked, currentKey, todayKey]);
+  }, [bills, expenses, categoryLimits, locked, currentKey, todayKey]);
 
   if (locked) return <LockScreen onUnlock={() => setLocked(false)} />;
 
@@ -147,6 +155,7 @@ function App() {
                 <CopyMonthBanner onCopy={() => prevData && updateMonth((m) => mergeFromPrevious(m, prevData, currentKey))} />
               )}
               <DueAlerts currentKey={currentKey} bills={month.bills} />
+              <LimitAlerts expenses={month.expenses} limits={categoryLimits} />
               <Ledger month={calc} previousBalance={previousBalance} />
               <DailyBudget month={calc} currentKey={currentKey} />
               <SpendingBar month={calc} />

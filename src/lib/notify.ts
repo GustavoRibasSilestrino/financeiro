@@ -1,4 +1,5 @@
 import { formatBRL } from "./finance";
+import type { LimitAlert } from "./limits";
 import { daysInMonth, monthKey } from "./storage";
 import type { Bill } from "./types";
 
@@ -70,4 +71,22 @@ export async function notifyDueBills(bills: Bill[]): Promise<number> {
     localStorage.setItem(SENT_KEY, JSON.stringify({ date: today, ids: [...sent, ...due.map(({ b }) => b.id)] }));
   }
   return due.length;
+}
+
+/** Reminds, once a day per category, about spending that reached 80% of its limit. */
+export async function notifyLimits(alerts: LimitAlert[]): Promise<number> {
+  if (!notificationsEnabled() || alerts.length === 0) return 0;
+  const now = new Date();
+  const today = `${monthKey(now)}-${String(now.getDate()).padStart(2, "0")}`;
+  const sent = readSent(today);
+  const fresh = alerts.filter((a) => !sent.includes(`limit-${a.category}`));
+
+  for (const a of fresh) {
+    const title = a.over ? `${a.category}: passou do limite` : `${a.category}: ${Math.round(a.ratio * 100)}% do limite`;
+    await show(title, `${formatBRL(a.spent)} de ${formatBRL(a.limit)}`, `limit-${a.category}`);
+  }
+  if (fresh.length) {
+    localStorage.setItem(SENT_KEY, JSON.stringify({ date: today, ids: [...sent, ...fresh.map((a) => `limit-${a.category}`)] }));
+  }
+  return fresh.length;
 }
