@@ -7,6 +7,7 @@ import { BillsSection } from "./components/BillsSection";
 import { CalendarView } from "./components/CalendarView";
 import { CategoryChart } from "./components/CategoryChart";
 import { DebtsSection } from "./components/DebtsSection";
+import { ProjectionChart } from "./components/ProjectionChart";
 import { MonthlySpendingChart } from "./components/MonthlySpendingChart";
 import { EvolutionChart, type MonthPoint } from "./components/EvolutionChart";
 import { ExpensesSection } from "./components/ExpensesSection";
@@ -141,6 +142,9 @@ function App() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <div className="lg:col-span-2">
                 <MonthlySpendingChart data={history} />
+              </div>
+              <div className="lg:col-span-2">
+                <ProjectionChart month={month} currentKey={currentKey} />
               </div>
               <EvolutionChart data={history} />
               <CategoryChart data={categories} />
