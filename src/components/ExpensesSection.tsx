@@ -1,20 +1,24 @@
 import { useState } from "react";
 import { defaultExpenseDate, isISODate, monthBounds, parseTags, shortDate } from "../lib/dates";
+import { splitShare, weeklySeries } from "../lib/expenses";
 import { formatBRL } from "../lib/finance";
+import { compressImage, deleteReceipt, saveReceipt } from "../lib/receipts";
 import { CATEGORIES, type Category, type Expense } from "../lib/types";
 import { EditRow } from "./EditRow";
+import { ReceiptViewer } from "./ReceiptViewer";
 
 interface Props {
   expenses: Expense[];
   currentKey: string;
-  onAdd: (expense: Expense) => void;
+  onAdd: (expenses: Expense[]) => void;
   onRemove: (id: string) => void;
+  onRemoveGroup: (group: string) => void;
   onUpdate: (id: string, patch: Partial<Expense>) => void;
 }
 
 const field = "w-full border-b border-line focus:border-rust outline-none py-1.5 bg-transparent";
 
-export function ExpensesSection({ expenses, currentKey, onAdd, onRemove, onUpdate }: Props) {
+export function ExpensesSection({ expenses, currentKey, onAdd, onRemove, onRemoveGroup, onUpdate }: Props) {
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState<Category>("Outros");
@@ -22,6 +26,10 @@ export function ExpensesSection({ expenses, currentKey, onAdd, onRemove, onUpdat
   const [date, setDate] = useState(() => defaultExpenseDate(currentKey));
   const [tags, setTags] = useState("");
   const [note, setNote] = useState("");
+  const [weekly, setWeekly] = useState(false);
+  const [people, setPeople] = useState("");
+  const [viewing, setViewing] = useState<Expense | null>(null);
+  const [receiptError, setReceiptError] = useState<string | null>(null);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -52,25 +60,54 @@ export function ExpensesSection({ expenses, currentKey, onAdd, onRemove, onUpdat
   for (const e of expenses) for (const t of e.tags ?? []) tagTotals.set(t, (tagTotals.get(t) ?? 0) + e.amount);
   const tagList = Array.from(tagTotals.entries()).sort((a, b) => b[1] - a[1]);
 
+  function remove(e: Expense) {
+    if (e.hasReceipt) void deleteReceipt(e.id).catch(() => undefined);
+    onRemove(e.id);
+  }
+
+  function pickReceipt(e: Expense) {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      try {
+        await saveReceipt(e.id, await compressImage(file));
+        onUpdate(e.id, { hasReceipt: true });
+        setReceiptError(null);
+      } catch {
+        setReceiptError("Não foi possível salvar a foto. Tente outra imagem.");
+      }
+    };
+    input.click();
+  }
+
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const v = Number(amount.replace(",", "."));
     if (!name.trim() || !Number.isFinite(v) || v <= 0) return;
     const parsedTags = parseTags(tags);
-    onAdd({
-      id: crypto.randomUUID(),
+    const n = Math.round(Number(people));
+    const splitting = Number.isFinite(n) && n >= 2;
+    const base: Omit<Expense, "id"> = {
       name: name.trim(),
-      amount: v,
+      amount: splitting ? splitShare(v, n) : v,
       category,
       fixed,
       date: isISODate(shownDate) ? shownDate : undefined,
       tags: parsedTags.length ? parsedTags : undefined,
       note: note.trim() || undefined,
-    });
+      splitTotal: splitting ? v : undefined,
+      splitPeople: splitting ? n : undefined,
+    };
+    onAdd(weekly && base.date ? weeklySeries(base, base.date) : [{ ...base, id: crypto.randomUUID() }]);
     setName("");
     setAmount("");
     setTags("");
     setNote("");
+    setPeople("");
+    setWeekly(false);
   }
 
   return (
@@ -117,6 +154,14 @@ export function ExpensesSection({ expenses, currentKey, onAdd, onRemove, onUpdat
           <label className="text-xs text-ink-faint">Observação (opcional)</label>
           <input className={field} placeholder="detalhe do gasto" value={note} onChange={(e) => setNote(e.target.value)} />
         </div>
+        <div className="w-32">
+          <label className="text-xs text-ink-faint">Dividir com (opcional)</label>
+          <input className={field} placeholder="nº de pessoas" inputMode="numeric" aria-label="Dividir entre quantas pessoas" value={people} onChange={(e) => setPeople(e.target.value)} />
+        </div>
+        <label className="flex items-center gap-2 text-sm text-ink-soft pb-1.5 cursor-pointer">
+          <input type="checkbox" className="stamp-checkbox" checked={weekly} onChange={(e) => setWeekly(e.target.checked)} />
+          toda semana
+        </label>
         <div className="flex items-center gap-2 pb-1.5">
           <button
             type="button"
@@ -257,6 +302,8 @@ export function ExpensesSection({ expenses, currentKey, onAdd, onRemove, onUpdat
                   <span className="text-[11px] text-ink-faint">
                     {e.date ? `${shortDate(e.date)} · ` : ""}
                     {e.fixed ? "fixo" : "variável"}
+                    {e.weeklyGroup ? " · toda semana" : ""}
+                    {e.splitTotal && e.splitPeople ? ` · ${formatBRL(e.splitTotal)} ÷ ${e.splitPeople}` : ""}
                   </span>
                 </div>
                 {(e.tags?.length || e.note) && (
@@ -273,6 +320,26 @@ export function ExpensesSection({ expenses, currentKey, onAdd, onRemove, onUpdat
               <div className="flex items-center gap-3">
                 <span className="tabular-nums text-ink-soft">{formatBRL(e.amount)}</span>
                 <button
+                  onClick={() => (e.hasReceipt ? setViewing(e) : pickReceipt(e))}
+                  className={`opacity-60 hover:opacity-100 transition-opacity cursor-pointer p-1.5 -m-1.5 ${e.hasReceipt ? "text-sage-dark" : "text-ink-faint hover:text-rust-dark"}`}
+                  aria-label={e.hasReceipt ? "Ver comprovante" : "Anexar comprovante"}
+                  title={e.hasReceipt ? "Ver comprovante" : "Anexar foto do comprovante"}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" />
+                    <circle cx="12" cy="13" r="3.5" />
+                  </svg>
+                </button>
+                {e.weeklyGroup && (
+                  <button
+                    onClick={() => window.confirm("Remover todos os lançamentos desta série semanal neste mês?") && onRemoveGroup(e.weeklyGroup!)}
+                    className="text-[11px] text-ink-faint hover:text-brick cursor-pointer whitespace-nowrap"
+                    title="Remover a série inteira"
+                  >
+                    série
+                  </button>
+                )}
+                <button
                   onClick={() => setEditingId(e.id)}
                   className="text-ink-faint opacity-60 hover:opacity-100 hover:text-rust-dark transition-opacity cursor-pointer p-1.5 -m-1.5"
                   aria-label="Editar"
@@ -282,7 +349,7 @@ export function ExpensesSection({ expenses, currentKey, onAdd, onRemove, onUpdat
                   </svg>
                 </button>
                 <button
-                  onClick={() => onRemove(e.id)}
+                  onClick={() => remove(e)}
                   className="text-ink-faint opacity-50 group-hover:opacity-100 hover:text-brick transition-opacity cursor-pointer p-1.5 -m-1.5 text-lg leading-none"
                   aria-label="Remover"
                 >
@@ -293,6 +360,23 @@ export function ExpensesSection({ expenses, currentKey, onAdd, onRemove, onUpdat
           )
         )}
       </ul>
+      {receiptError && (
+        <p className="mt-3 text-sm text-brick" role="status">
+          {receiptError}
+        </p>
+      )}
+      {viewing && (
+        <ReceiptViewer
+          id={viewing.id}
+          title={viewing.name}
+          onClose={() => setViewing(null)}
+          onRemove={() => {
+            void deleteReceipt(viewing.id).catch(() => undefined);
+            onUpdate(viewing.id, { hasReceipt: false });
+            setViewing(null);
+          }}
+        />
+      )}
     </section>
   );
 }

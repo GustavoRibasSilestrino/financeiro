@@ -1,3 +1,4 @@
+import { weeklySeriesIn } from "./expenses";
 import { daysInMonth, shiftMonthKey } from "./storage";
 import { emptyMonth, type MonthData, type Store } from "./types";
 
@@ -17,9 +18,20 @@ export function previousMonthWithData(store: Store, key: string): MonthData | nu
 export function carryOver(prev: MonthData, key: string, all = false): Required<Pick<MonthData, "expenses" | "bills" | "debts" | "incomes">> {
   return {
     incomes: (prev.incomes ?? []).filter((i) => all || i.recurring !== false).map((i) => ({ ...i, id: crypto.randomUUID() })),
-    expenses: prev.expenses
-      .filter((e) => all || e.fixed)
-      .map((e) => ({ ...e, id: crypto.randomUUID(), date: e.date ? sameDayIn(key, e.date) : undefined })),
+    expenses: [
+      ...prev.expenses
+        .filter((e) => !e.weeklyGroup && (all || e.fixed))
+        .map((e) => ({
+          ...e,
+          id: crypto.randomUUID(),
+          date: e.date ? sameDayIn(key, e.date) : undefined,
+          splitTotal: undefined,
+          splitPeople: undefined,
+          received: undefined,
+          hasReceipt: undefined,
+        })),
+      ...weeklyTemplates(prev).flatMap((t) => weeklySeriesIn(t, key)),
+    ],
     bills: prev.bills
       .filter((b) => all || b.recurring !== false)
       .map((b) => ({ ...b, id: crypto.randomUUID(), paid: false, purchases: undefined })),
@@ -64,4 +76,11 @@ export function mergeFromPrevious(current: MonthData, prev: MonthData, key: stri
 function sameDayIn(key: string, iso: string): string {
   const day = Math.min(Number(iso.split("-")[2]) || 1, daysInMonth(key));
   return `${key}-${String(day).padStart(2, "0")}`;
+}
+
+/** One expense from each weekly series, enough to rebuild the series in another month. */
+function weeklyTemplates(month: MonthData) {
+  const byGroup = new Map<string, MonthData["expenses"][number]>();
+  for (const e of month.expenses) if (e.weeklyGroup && !byGroup.has(e.weeklyGroup)) byGroup.set(e.weeklyGroup, e);
+  return Array.from(byGroup.values());
 }
