@@ -11,6 +11,7 @@ import { CategoryCompare } from "./components/CategoryCompare";
 import { ReserveTracker } from "./components/ReserveTracker";
 import { IncomeSources } from "./components/IncomeSources";
 import { NotificationSettings } from "./components/NotificationSettings";
+import { SubscriptionsCard } from "./components/SubscriptionsCard";
 import { LockScreen } from "./components/LockScreen";
 import { PinSettings } from "./components/PinSettings";
 import { DailyBudget } from "./components/DailyBudget";
@@ -164,6 +165,8 @@ function App() {
                   updateMonth((m) => ({ ...m, expenses: m.expenses.map((e) => (e.id === id ? { ...e, ...patch } : e)) }))
                 }
               />
+
+              <SubscriptionsCard month={calc} />
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 <BillsSection
