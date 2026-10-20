@@ -17,8 +17,17 @@ export function ExpensesSection({ expenses, onAdd, onRemove, onUpdate }: Props) 
   const [fixed, setFixed] = useState(true);
 
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [filterCategory, setFilterCategory] = useState<Category | "">("");
 
   const total = expenses.reduce((s, e) => s + e.amount, 0);
+
+  const q = query.trim().toLowerCase();
+  const filtering = q !== "" || filterCategory !== "";
+  const visible = expenses.filter(
+    (e) => (!filterCategory || e.category === filterCategory) && (!q || e.name.toLowerCase().includes(q))
+  );
+  const visibleTotal = visible.reduce((s, e) => s + e.amount, 0);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -104,11 +113,58 @@ export function ExpensesSection({ expenses, onAdd, onRemove, onUpdate }: Props) 
         </button>
       </form>
 
-      <ul className="mt-6 divide-y divide-dashed divide-line">
+      {expenses.length > 0 && (
+        <div className="mt-6 flex flex-wrap items-center gap-2">
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar gasto..."
+            aria-label="Buscar gasto"
+            className="flex-1 min-w-[140px] bg-paper-soft rounded-full px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-rust/50"
+          />
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value as Category | "")}
+            aria-label="Filtrar por categoria"
+            className="bg-paper-soft rounded-full px-4 py-2 text-sm text-ink-soft outline-none cursor-pointer"
+          >
+            <option value="">Todas as categorias</option>
+            {CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+          {filtering && (
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                setFilterCategory("");
+              }}
+              className="text-xs text-rust-dark hover:underline cursor-pointer"
+            >
+              limpar
+            </button>
+          )}
+        </div>
+      )}
+      {filtering && (
+        <p className="mt-3 text-sm text-ink-soft" role="status">
+          {visible.length} {visible.length === 1 ? "lançamento" : "lançamentos"} ·{" "}
+          <span className="text-ink font-medium">{formatBRL(visibleTotal)}</span>
+        </p>
+      )}
+
+      <ul className="mt-4 divide-y divide-dashed divide-line">
         {expenses.length === 0 && (
           <li className="text-ink-faint text-sm py-4">Nenhum gasto lançado ainda.</li>
         )}
-        {expenses.map((e) =>
+        {expenses.length > 0 && visible.length === 0 && (
+          <li className="text-ink-faint text-sm py-4">Nenhum gasto encontrado com esse filtro.</li>
+        )}
+        {visible.map((e) =>
           editingId === e.id ? (
             <EditRow
               key={e.id}

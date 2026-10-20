@@ -7,6 +7,7 @@ import { BillsSection } from "./components/BillsSection";
 import { CalendarView } from "./components/CalendarView";
 import { CategoryChart } from "./components/CategoryChart";
 import { DebtsSection } from "./components/DebtsSection";
+import { QuickAdd } from "./components/QuickAdd";
 import { ProjectionChart } from "./components/ProjectionChart";
 import { MonthlySpendingChart } from "./components/MonthlySpendingChart";
 import { EvolutionChart, type MonthPoint } from "./components/EvolutionChart";
@@ -172,6 +173,7 @@ function App() {
           Seus dados ficam só neste navegador — nada é enviado pra lugar nenhum.
         </footer>
       </div>
+      <QuickAdd onAdd={(expense: Expense) => updateMonth((m) => ({ ...m, expenses: [...m.expenses, expense] }))} />
     </div>
   );
 }
