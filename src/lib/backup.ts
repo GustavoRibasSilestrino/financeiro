@@ -13,7 +13,7 @@ function download(filename: string, content: string, mime: string) {
 const stamp = () => new Date().toISOString().slice(0, 10);
 
 export function exportBackup(store: Store) {
-  download(`ninho-backup-${stamp()}.json`, JSON.stringify(store, null, 2), "application/json");
+  download(`prumo-backup-${stamp()}.json`, JSON.stringify(store, null, 2), "application/json");
 }
 
 /** Validates and normalizes a backup file; throws a user-readable Error on bad input. */
@@ -22,15 +22,15 @@ export function parseBackup(text: string): Store {
   try {
     raw = JSON.parse(text);
   } catch {
-    throw new Error("Esse arquivo não é um backup válido do Ninho.");
+    throw new Error("Esse arquivo não é um backup válido do Prumo.");
   }
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
-    throw new Error("Esse arquivo não é um backup válido do Ninho.");
+    throw new Error("Esse arquivo não é um backup válido do Prumo.");
   }
   const store: Store = {};
   for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
     if (!/^\d{4}-\d{2}$/.test(key) || !value || typeof value !== "object") {
-      throw new Error("Esse arquivo não é um backup válido do Ninho.");
+      throw new Error("Esse arquivo não é um backup válido do Prumo.");
     }
     const v = value as Partial<MonthData>;
     store[key] = {
@@ -79,5 +79,5 @@ export function exportCsv(store: Store) {
   }
   // BOM + ";" so Excel (pt-BR) opens it with accents and columns right
   const csv = "﻿" + rows.map((r) => r.map(csvCell).join(";")).join("\n");
-  download(`ninho-${stamp()}.csv`, csv, "text/csv;charset=utf-8");
+  download(`prumo-${stamp()}.csv`, csv, "text/csv;charset=utf-8");
 }

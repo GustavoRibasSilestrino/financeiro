@@ -13,7 +13,7 @@ const TOP = 5;
 export function summaryText(s: Summary): string {
   const total = s.categories.reduce((sum, c) => sum + c.amount, 0);
   const lines = [
-    `Ninho — ${s.label}`,
+    `Prumo — ${s.label}`,
     `Entrou: ${formatBRL(s.income)}`,
     `Saiu: ${formatBRL(s.out)}`,
     `${s.balance >= 0 ? "Sobrou" : "Faltou"}: ${formatBRL(Math.abs(s.balance))}`,
@@ -50,7 +50,7 @@ export async function summaryImage(s: Summary): Promise<Blob> {
     ctx.fillText(t, x, y);
   };
 
-  text("Ninho", 80, 130, "#eceefb", font(56, 800));
+  text("Prumo", 80, 130, "#eceefb", font(56, 800));
   text(s.label, 80, 190, "#a4a9c7", font(36));
 
   const hero = ctx.createLinearGradient(60, 250, W - 60, 600);
@@ -85,7 +85,7 @@ export async function summaryImage(s: Summary): Promise<Blob> {
     });
   }
 
-  text("Feito com o Ninho", W / 2, H - 60, "#7a80a3", font(28), "center");
+  text("Feito com o Prumo", W / 2, H - 60, "#7a80a3", font(28), "center");
 
   return new Promise((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("falha ao gerar a imagem"))), "image/png"));
 }

@@ -31,7 +31,7 @@ export function LockScreen({ onUnlock }: Props) {
   return (
     <div className="min-h-screen grid place-content-center px-6">
       <form onSubmit={submit} className="w-full max-w-xs text-center">
-        <h1 className="font-display font-extrabold text-3xl tracking-tight">Ninho</h1>
+        <h1 className="font-display font-extrabold text-3xl tracking-tight">Prumo</h1>
         <p className="text-ink-soft text-sm mt-2">Digite seu PIN para entrar</p>
 
         <input

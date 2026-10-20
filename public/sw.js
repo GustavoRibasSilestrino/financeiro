@@ -1,5 +1,5 @@
 // Offline support: hashed build assets are cached forever, pages go network-first with a cached fallback.
-const CACHE = "ninho-v1";
+const CACHE = "prumo-v1";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(["/", "/icon.svg", "/manifest.webmanifest"])));

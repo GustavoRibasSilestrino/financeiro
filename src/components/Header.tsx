@@ -13,7 +13,7 @@ export function Header({ currentKey, onChange }: Props) {
           <span className="sm:hidden">{today(true)}</span>
           <span className="hidden sm:inline">{today(false)}</span>
         </p>
-        <h1 className="font-display font-extrabold text-2xl sm:text-4xl tracking-tight">Ninho</h1>
+        <h1 className="font-display font-extrabold text-2xl sm:text-4xl tracking-tight">Prumo</h1>
       </div>
 
       <div className="flex items-center bg-card border border-line rounded-full p-1 shadow-warm shrink-0">

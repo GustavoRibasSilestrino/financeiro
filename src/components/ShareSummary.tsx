@@ -23,7 +23,7 @@ export function ShareSummary({ summary }: Props) {
     setBusy(true);
     try {
       const blob = await summaryImage(summary);
-      const file = new File([blob], `ninho-${summary.label.toLowerCase().replaceAll(" ", "-")}.png`, { type: "image/png" });
+      const file = new File([blob], `prumo-${summary.label.toLowerCase().replaceAll(" ", "-")}.png`, { type: "image/png" });
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], text: summaryText(summary) });
         setMessage(null);
