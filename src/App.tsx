@@ -14,6 +14,7 @@ import { NotificationSettings } from "./components/NotificationSettings";
 import { SubscriptionsCard } from "./components/SubscriptionsCard";
 import { ObjectivesSection } from "./components/ObjectivesSection";
 import { LimitAlerts } from "./components/LimitAlerts";
+import { ShareSummary } from "./components/ShareSummary";
 import { MonthClose } from "./components/MonthClose";
 import { LockScreen } from "./components/LockScreen";
 import { PinSettings } from "./components/PinSettings";
@@ -175,6 +176,15 @@ function App() {
                 />
               )}
               <MonthNote note={month.note} onChange={(note) => updateMonth((m) => ({ ...m, note }))} />
+              <ShareSummary
+                summary={{
+                  label: labelForMonthKey(currentKey),
+                  income: totalIncome(calc),
+                  out: totalOut(calc),
+                  balance: balance(calc),
+                  categories,
+                }}
+              />
               <DataTools store={store} onImport={replaceStore} />
               <NotificationSettings />
               <PinSettings onLock={() => setLocked(true)} />
