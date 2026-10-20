@@ -19,7 +19,7 @@ export function carryOver(prev: MonthData, all = false): Pick<MonthData, "expens
     expenses: prev.expenses.filter((e) => all || e.fixed).map((e) => ({ ...e, id: crypto.randomUUID() })),
     bills: prev.bills
       .filter((b) => all || b.recurring !== false)
-      .map((b) => ({ ...b, id: crypto.randomUUID(), paid: false })),
+      .map((b) => ({ ...b, id: crypto.randomUUID(), paid: false, purchases: undefined })),
     debts: prev.debts.map((d) => ({ ...d, id: crypto.randomUUID() })),
   };
 }

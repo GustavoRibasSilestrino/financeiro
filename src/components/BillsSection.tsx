@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { EditRow } from "./EditRow";
 import { formatBRL } from "../lib/finance";
-import type { Bill } from "../lib/types";
+import type { Bill, Purchase } from "../lib/types";
+import { BillPurchases } from "./BillPurchases";
 
 interface Props {
   bills: Bill[];
@@ -18,6 +19,7 @@ export function BillsSection({ bills, onAdd, onRemove, onTogglePaid, onUpdate }:
 
   const [recurring, setRecurring] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const total = bills.reduce((s, b) => s + b.amount, 0);
 
@@ -121,7 +123,19 @@ export function BillsSection({ bills, onAdd, onRemove, onTogglePaid, onUpdate }:
               />
               <div className={`min-w-0 ${b.paid ? "opacity-50" : ""}`}>
                 <p className={`truncate ${b.paid ? "line-through" : ""}`}>{b.name}</p>
-                <p className="text-[11px] text-ink-faint">vence dia {b.dueDay}{b.recurring !== false ? " · todo mês" : ""}</p>
+                <p className="text-[11px] text-ink-faint">
+                  vence dia {b.dueDay}
+                  {b.recurring !== false ? " · todo mês" : ""}
+                  {" · "}
+                  <button
+                    type="button"
+                    onClick={() => setOpenId(openId === b.id ? null : b.id)}
+                    className="text-rust-dark hover:underline cursor-pointer"
+                    aria-expanded={openId === b.id}
+                  >
+                    {b.purchases?.length ? `${b.purchases.length} ${b.purchases.length === 1 ? "compra" : "compras"}` : "detalhar compras"}
+                  </button>
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -145,6 +159,17 @@ export function BillsSection({ bills, onAdd, onRemove, onTogglePaid, onUpdate }:
                 ×
               </button>
             </div>
+            {openId === b.id && (
+              <BillPurchases
+                purchases={b.purchases ?? []}
+                onChange={(purchases: Purchase[]) =>
+                  onUpdate(b.id, {
+                    purchases,
+                    amount: purchases.length ? Math.round(purchases.reduce((sum, x) => sum + x.amount, 0) * 100) / 100 : b.amount,
+                  })
+                }
+              />
+            )}
           </li>
           )
         )}

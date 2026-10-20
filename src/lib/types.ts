@@ -29,6 +29,12 @@ export interface Expense {
   fixed: boolean;
 }
 
+export interface Purchase {
+  id: string;
+  name: string;
+  amount: number;
+}
+
 export interface Bill {
   id: string;
   name: string;
@@ -36,6 +42,8 @@ export interface Bill {
   dueDay: number;
   paid: boolean;
   recurring?: boolean;
+  /** Itemized charges (e.g. credit card purchases); when present they add up to `amount`. */
+  purchases?: Purchase[];
 }
 
 export interface Debt {
