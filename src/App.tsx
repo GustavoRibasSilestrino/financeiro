@@ -10,6 +10,7 @@ import { DebtsSection } from "./components/DebtsSection";
 import { CategoryCompare } from "./components/CategoryCompare";
 import { ReserveTracker } from "./components/ReserveTracker";
 import { IncomeSources } from "./components/IncomeSources";
+import { NotificationSettings } from "./components/NotificationSettings";
 import { LockScreen } from "./components/LockScreen";
 import { PinSettings } from "./components/PinSettings";
 import { DailyBudget } from "./components/DailyBudget";
@@ -28,11 +29,12 @@ import { MonthNote } from "./components/MonthNote";
 import { SpendingBar } from "./components/SpendingBar";
 import { NavTabs, type TabId } from "./components/NavTabs";
 import { useStore } from "./hooks/useStore";
+import { notifyDueBills } from "./lib/notify";
 import { hasPin } from "./lib/pin";
 import { countableMonth } from "./lib/debts";
 import { mergeFromPrevious, previousMonthWithData } from "./lib/recurring";
-import { balance, expensesByCategory, totalIncome, totalOut } from "./lib/finance";
-import { effectiveCategoryLimits, effectiveReserve, labelForMonthKey, getMonth, shiftMonthKey, shortLabelForMonthKey } from "./lib/storage";
+import { balance, expensesByCategory, itemsByCategory, totalIncome, totalOut } from "./lib/finance";
+import { monthKey, effectiveCategoryLimits, effectiveReserve, labelForMonthKey, getMonth, shiftMonthKey, shortLabelForMonthKey } from "./lib/storage";
 import type { Bill, Debt, Expense } from "./lib/types";
 
 function App() {
@@ -80,6 +82,17 @@ function App() {
     updateMonth((m) => ({ ...m, bills: m.bills.map((b) => (b.id === id ? { ...b, dueDay: day } : b)) }));
   }
 
+  // due-bill reminders: when bills change and whenever the app comes back to the foreground
+  const bills = month.bills;
+  const todayKey = monthKey(new Date());
+  useEffect(() => {
+    if (locked || currentKey !== todayKey) return;
+    void notifyDueBills(bills);
+    const onVisible = () => !document.hidden && void notifyDueBills(bills);
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [bills, locked, currentKey, todayKey]);
+
   if (locked) return <LockScreen onUnlock={() => setLocked(false)} />;
 
   return (
@@ -107,6 +120,7 @@ function App() {
               <IncomeSources incomes={month.incomes ?? []} onChange={(incomes) => updateMonth((m) => ({ ...m, incomes }))} />
               <MonthNote note={month.note} onChange={(note) => updateMonth((m) => ({ ...m, note }))} />
               <DataTools store={store} onImport={replaceStore} />
+              <NotificationSettings />
               <PinSettings onLock={() => setLocked(true)} />
             </>
           )}
@@ -191,7 +205,7 @@ function App() {
                 <ProjectionChart month={month} currentKey={currentKey} />
               </div>
               <EvolutionChart data={history} />
-              <CategoryChart data={categories} />
+              <CategoryChart data={categories} items={itemsByCategory(calc)} />
               <div className="lg:col-span-2">
                 <CategoryCompare current={categories} previous={previousCategories} previousLabel={labelForMonthKey(previousKey)} />
               </div>

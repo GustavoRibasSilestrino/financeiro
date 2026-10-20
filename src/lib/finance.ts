@@ -54,3 +54,22 @@ export function expensesByCategory(month: MonthData): CategorySlice[] {
     .map(([category, amount]) => ({ category, amount }))
     .sort((a, b) => b.amount - a.amount);
 }
+
+export interface CategoryItem {
+  id: string;
+  name: string;
+  amount: number;
+  date?: string;
+}
+
+/** The individual entries behind each slice of expensesByCategory(). */
+export function itemsByCategory(month: MonthData): Record<string, CategoryItem[]> {
+  const out: Record<string, CategoryItem[]> = {};
+  for (const e of month.expenses) {
+    (out[e.category] ??= []).push({ id: e.id, name: e.name, amount: e.amount, date: e.date });
+  }
+  if (month.bills.length) out["Faturas"] = month.bills.map((b) => ({ id: b.id, name: b.name, amount: b.amount }));
+  if (month.debts.length) out["Dívidas"] = month.debts.map((d) => ({ id: d.id, name: d.name, amount: d.installmentAmount }));
+  for (const list of Object.values(out)) list.sort((a, b) => b.amount - a.amount);
+  return out;
+}
