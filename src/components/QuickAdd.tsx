@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import { defaultExpenseDate } from "../lib/dates";
 import { CATEGORIES, type Category, type Expense } from "../lib/types";
 
 interface Props {
+  currentKey: string;
   onAdd: (expense: Expense) => void;
 }
 
-export function QuickAdd({ onAdd }: Props) {
+export function QuickAdd({ currentKey, onAdd }: Props) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
@@ -25,7 +27,7 @@ export function QuickAdd({ onAdd }: Props) {
     e.preventDefault();
     const v = Number(amount.replace(",", "."));
     if (!name.trim() || !Number.isFinite(v) || v <= 0) return;
-    onAdd({ id: crypto.randomUUID(), name: name.trim(), amount: v, category, fixed: false });
+    onAdd({ id: crypto.randomUUID(), name: name.trim(), amount: v, category, fixed: false, date: defaultExpenseDate(currentKey) });
     setName("");
     setAmount("");
     setSaved(true);

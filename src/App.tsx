@@ -11,6 +11,8 @@ import { CategoryCompare } from "./components/CategoryCompare";
 import { ReserveTracker } from "./components/ReserveTracker";
 import { LockScreen } from "./components/LockScreen";
 import { PinSettings } from "./components/PinSettings";
+import { DailyBudget } from "./components/DailyBudget";
+import { DailySpendingChart } from "./components/DailySpendingChart";
 import { QuickAdd } from "./components/QuickAdd";
 import { ProjectionChart } from "./components/ProjectionChart";
 import { MonthlySpendingChart } from "./components/MonthlySpendingChart";
@@ -90,10 +92,11 @@ function App() {
           {tab === "resumo" && (
             <>
               {monthIsEmpty && prevData && (
-                <CopyMonthBanner onCopy={() => prevData && updateMonth((m) => mergeFromPrevious(m, prevData))} />
+                <CopyMonthBanner onCopy={() => prevData && updateMonth((m) => mergeFromPrevious(m, prevData, currentKey))} />
               )}
               <DueAlerts currentKey={currentKey} bills={month.bills} />
               <Ledger month={calc} previousBalance={previousBalance} />
+              <DailyBudget month={calc} currentKey={currentKey} />
               <SpendingBar month={calc} />
               <IncomeCard
                 month={month}
@@ -135,6 +138,7 @@ function App() {
               />
               <ExpensesSection
                 expenses={month.expenses}
+                currentKey={currentKey}
                 onAdd={(expense: Expense) => updateMonth((m) => ({ ...m, expenses: [...m.expenses, expense] }))}
                 onRemove={(id) =>
                   updateMonth((m) => ({ ...m, expenses: m.expenses.filter((e) => e.id !== id) }))
@@ -175,6 +179,9 @@ function App() {
           {tab === "evolucao" && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <div className="lg:col-span-2">
+                <DailySpendingChart expenses={month.expenses} currentKey={currentKey} />
+              </div>
+              <div className="lg:col-span-2">
                 <MonthlySpendingChart data={history} />
               </div>
               <div className="lg:col-span-2">
@@ -209,7 +216,7 @@ function App() {
           Seus dados ficam só neste navegador — nada é enviado pra lugar nenhum.
         </footer>
       </div>
-      <QuickAdd onAdd={(expense: Expense) => updateMonth((m) => ({ ...m, expenses: [...m.expenses, expense] }))} />
+      <QuickAdd currentKey={currentKey} onAdd={(expense: Expense) => updateMonth((m) => ({ ...m, expenses: [...m.expenses, expense] }))} />
     </div>
   );
 }

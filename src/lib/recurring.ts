@@ -1,4 +1,4 @@
-import { shiftMonthKey } from "./storage";
+import { daysInMonth, shiftMonthKey } from "./storage";
 import { emptyMonth, type MonthData, type Store } from "./types";
 
 /** Most recent month before `key` that has any data, looking back up to 24 months. */
@@ -14,9 +14,11 @@ export function previousMonthWithData(store: Store, key: string): MonthData | nu
  * Items that repeat on their own: fixed expenses, recurring bills and every debt (its dates decide if it counts).
  * With `all`, also brings variable expenses and one-off bills.
  */
-export function carryOver(prev: MonthData, all = false): Pick<MonthData, "expenses" | "bills" | "debts"> {
+export function carryOver(prev: MonthData, key: string, all = false): Pick<MonthData, "expenses" | "bills" | "debts"> {
   return {
-    expenses: prev.expenses.filter((e) => all || e.fixed).map((e) => ({ ...e, id: crypto.randomUUID() })),
+    expenses: prev.expenses
+      .filter((e) => all || e.fixed)
+      .map((e) => ({ ...e, id: crypto.randomUUID(), date: e.date ? sameDayIn(key, e.date) : undefined })),
     bills: prev.bills
       .filter((b) => all || b.recurring !== false)
       .map((b) => ({ ...b, id: crypto.randomUUID(), paid: false, purchases: undefined })),
@@ -31,7 +33,7 @@ export function materializeMonth(store: Store, key: string): Store {
   if (keys.length === 0 || keys.some((k) => k > key)) return store;
   const prev = previousMonthWithData(store, key);
   if (!prev) return store;
-  const carried = carryOver(prev);
+  const carried = carryOver(prev, key);
   const hasSomething =
     prev.income > 0 || prev.extraIncome > 0 || carried.expenses.length + carried.bills.length + carried.debts.length > 0;
   if (!hasSomething) return store;
@@ -42,8 +44,8 @@ export function materializeMonth(store: Store, key: string): Store {
 }
 
 /** Adds items from the previous month that aren't already here (matched by name). */
-export function mergeFromPrevious(current: MonthData, prev: MonthData): MonthData {
-  const carried = carryOver(prev, true);
+export function mergeFromPrevious(current: MonthData, prev: MonthData, key: string): MonthData {
+  const carried = carryOver(prev, key, true);
   const missing = <T extends { name: string }>(have: T[], add: T[]) =>
     add.filter((a) => !have.some((h) => h.name.toLowerCase() === a.name.toLowerCase()));
   return {
@@ -54,4 +56,10 @@ export function mergeFromPrevious(current: MonthData, prev: MonthData): MonthDat
     bills: [...current.bills, ...missing(current.bills, carried.bills)],
     debts: [...current.debts, ...missing(current.debts, carried.debts)],
   };
+}
+
+/** Same day of month as `iso`, moved into `key` (clamped for shorter months). */
+function sameDayIn(key: string, iso: string): string {
+  const day = Math.min(Number(iso.split("-")[2]) || 1, daysInMonth(key));
+  return `${key}-${String(day).padStart(2, "0")}`;
 }

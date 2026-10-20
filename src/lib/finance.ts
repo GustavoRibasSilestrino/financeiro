@@ -22,7 +22,7 @@ export function totalDebts(month: MonthData): number {
 }
 
 export function totalIncome(month: MonthData): number {
-  return month.income + month.extraIncome;
+  return month.income + month.extraIncome + (month.incomes ?? []).reduce((sum, i) => sum + i.amount, 0);
 }
 
 export function totalOut(month: MonthData): number {

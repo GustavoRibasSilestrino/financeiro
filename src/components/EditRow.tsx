@@ -3,7 +3,7 @@ import { useState } from "react";
 export interface EditField {
   key: string;
   label: string;
-  kind: "text" | "number" | "select" | "check" | "month";
+  kind: "text" | "number" | "select" | "check" | "month" | "date";
   options?: readonly string[];
   width?: string;
 }
@@ -62,7 +62,7 @@ export function EditRow({ fields, initial, onSave, onCancel }: Props) {
                 ) : (
                   <input
                     className={inputCls}
-                    type={f.kind === "month" ? "month" : "text"}
+                    type={f.kind === "month" ? "month" : f.kind === "date" ? "date" : "text"}
                     inputMode={f.kind === "number" ? "decimal" : undefined}
                     value={String(values[f.key])}
                     onChange={(e) => set(f.key, e.target.value)}

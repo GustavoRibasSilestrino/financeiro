@@ -27,6 +27,19 @@ export interface Expense {
   category: Category;
   amount: number;
   fixed: boolean;
+  /** Day the money left (YYYY-MM-DD). Older entries have none. */
+  date?: string;
+  tags?: string[];
+  note?: string;
+}
+
+export interface IncomeSource {
+  id: string;
+  name: string;
+  amount: number;
+  /** Day of the month the money arrives. */
+  day: number;
+  recurring?: boolean;
 }
 
 export interface Purchase {
@@ -63,6 +76,8 @@ export interface MonthData {
   goal: number;
   note: string;
   categoryLimits?: CategoryLimits;
+  /** Extra income sources beyond the two fixed fields above. */
+  incomes?: IncomeSource[];
   /** Emergency fund: amount saved so far and target in months of spending. Carried forward like category limits. */
   reserveSaved?: number;
   reserveMonths?: number;
