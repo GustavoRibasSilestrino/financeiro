@@ -43,7 +43,10 @@ export interface Debt {
   name: string;
   installmentAmount: number;
   totalInstallments: number;
-  paidInstallments: number;
+  /** First month (YYYY-MM) with an installment due. */
+  startMonth?: string;
+  /** Legacy counter from before debts had a start month. */
+  paidInstallments?: number;
 }
 
 export interface MonthData {

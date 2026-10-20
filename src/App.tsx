@@ -19,6 +19,7 @@ import { MonthNote } from "./components/MonthNote";
 import { SpendingBar } from "./components/SpendingBar";
 import { NavTabs, type TabId } from "./components/NavTabs";
 import { useStore } from "./hooks/useStore";
+import { countableMonth } from "./lib/debts";
 import { mergeFromPrevious, previousMonthWithData } from "./lib/recurring";
 import { balance, expensesByCategory, totalIncome, totalOut } from "./lib/finance";
 import { effectiveCategoryLimits, getMonth, shiftMonthKey, shortLabelForMonthKey } from "./lib/storage";
@@ -30,12 +31,13 @@ function App() {
 
   const previousKey = shiftMonthKey(currentKey, -1);
   const previousMonth = store[previousKey];
-  const previousBalance = previousMonth ? balance(previousMonth) : null;
+  const previousBalance = previousMonth ? balance(countableMonth(previousMonth, previousKey)) : null;
 
   const history: MonthPoint[] = [];
   for (let i = 5; i >= 0; i--) {
     const key = shiftMonthKey(currentKey, -i);
-    const m = getMonth(store, key);
+    const raw = getMonth(store, key);
+    const m = countableMonth(raw, key);
     history.push({ key, label: shortLabelForMonthKey(key), balance: balance(m), income: totalIncome(m), spent: totalOut(m), goal: m.goal });
   }
 
@@ -43,7 +45,8 @@ function App() {
   const prevData = previousMonthWithData(store, currentKey);
   const monthIsEmpty =
     month.expenses.length + month.bills.length + month.debts.length === 0 && month.income + month.extraIncome === 0;
-  const categories = expensesByCategory(month);
+  const calc = countableMonth(month, currentKey);
+  const categories = expensesByCategory(calc);
 
   function setBillDueDay(id: string, day: number) {
     updateMonth((m) => ({ ...m, bills: m.bills.map((b) => (b.id === id ? { ...b, dueDay: day } : b)) }));
@@ -63,8 +66,8 @@ function App() {
                 <CopyMonthBanner onCopy={() => prevData && updateMonth((m) => mergeFromPrevious(m, prevData))} />
               )}
               <DueAlerts currentKey={currentKey} bills={month.bills} />
-              <Ledger month={month} previousBalance={previousBalance} />
-              <SpendingBar month={month} />
+              <Ledger month={calc} previousBalance={previousBalance} />
+              <SpendingBar month={calc} />
               <IncomeCard
                 month={month}
                 onChange={(income, extraIncome) => updateMonth((m) => ({ ...m, income, extraIncome }))}
@@ -76,7 +79,7 @@ function App() {
 
           {tab === "metas" && (
             <>
-              <GoalTracker month={month} onSetGoal={(goal) => updateMonth((m) => ({ ...m, goal }))} />
+              <GoalTracker month={calc} onSetGoal={(goal) => updateMonth((m) => ({ ...m, goal }))} />
               <GoalsHistory data={[...history].reverse()} />
             </>
           )}
@@ -123,20 +126,11 @@ function App() {
                 />
                 <DebtsSection
                   debts={month.debts}
+                  currentKey={currentKey}
                   onAdd={(debt: Debt) => updateMonth((m) => ({ ...m, debts: [...m.debts, debt] }))}
                   onRemove={(id) => updateMonth((m) => ({ ...m, debts: m.debts.filter((d) => d.id !== id) }))}
                   onUpdate={(id, patch) =>
                     updateMonth((m) => ({ ...m, debts: m.debts.map((d) => (d.id === id ? { ...d, ...patch } : d)) }))
-                  }
-                  onAdvance={(id) =>
-                    updateMonth((m) => ({
-                      ...m,
-                      debts: m.debts.map((d) =>
-                        d.id === id
-                          ? { ...d, paidInstallments: Math.min(d.paidInstallments + 1, d.totalInstallments) }
-                          : d
-                      ),
-                    }))
                   }
                 />
               </div>

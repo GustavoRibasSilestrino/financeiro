@@ -11,7 +11,7 @@ export function previousMonthWithData(store: Store, key: string): MonthData | nu
 }
 
 /**
- * Items that repeat on their own: fixed expenses, recurring bills and debts still being paid.
+ * Items that repeat on their own: fixed expenses, recurring bills and every debt (its dates decide if it counts).
  * With `all`, also brings variable expenses and one-off bills.
  */
 export function carryOver(prev: MonthData, all = false): Pick<MonthData, "expenses" | "bills" | "debts"> {
@@ -20,9 +20,7 @@ export function carryOver(prev: MonthData, all = false): Pick<MonthData, "expens
     bills: prev.bills
       .filter((b) => all || b.recurring !== false)
       .map((b) => ({ ...b, id: crypto.randomUUID(), paid: false })),
-    debts: prev.debts
-      .filter((d) => d.paidInstallments < d.totalInstallments)
-      .map((d) => ({ ...d, id: crypto.randomUUID() })),
+    debts: prev.debts.map((d) => ({ ...d, id: crypto.randomUUID() })),
   };
 }
 

@@ -6,7 +6,7 @@ export function loadStore(): Store {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return {};
-    return JSON.parse(raw) as Store;
+    return migrateDebts(JSON.parse(raw) as Store);
   } catch {
     return {};
   }
@@ -61,4 +61,14 @@ export function effectiveCategoryLimits(store: Store, key: string): CategoryLimi
     if (limits && Object.keys(limits).length > 0) return limits;
   }
   return {};
+}
+
+/** Debts saved before start dates existed get one, inferred from how many installments were paid. */
+function migrateDebts(store: Store): Store {
+  for (const [key, month] of Object.entries(store)) {
+    for (const d of month.debts ?? []) {
+      if (!d.startMonth) d.startMonth = shiftMonthKey(key, -(d.paidInstallments ?? 0));
+    }
+  }
+  return store;
 }

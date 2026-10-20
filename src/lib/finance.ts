@@ -16,10 +16,9 @@ export function totalBills(month: MonthData): number {
   return month.bills.reduce((sum, b) => sum + b.amount, 0);
 }
 
+/** Expects a month already narrowed with countableMonth(), so only installments due this month are summed. */
 export function totalDebts(month: MonthData): number {
-  return month.debts
-    .filter((d) => d.paidInstallments < d.totalInstallments)
-    .reduce((sum, d) => sum + d.installmentAmount, 0);
+  return month.debts.reduce((sum, d) => sum + d.installmentAmount, 0);
 }
 
 export function totalIncome(month: MonthData): number {

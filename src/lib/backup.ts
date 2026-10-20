@@ -1,3 +1,4 @@
+import { debtInfo, monthYearLabel } from "./debts";
 import { CATEGORIES, emptyMonth, type MonthData, type Store } from "./types";
 
 function download(filename: string, content: string, mime: string) {
@@ -57,7 +58,16 @@ export function exportCsv(store: Store) {
     for (const e of m.expenses) rows.push([key, "Gasto", e.name, e.category, e.amount, e.fixed ? "fixo" : "variável"]);
     for (const b of m.bills) rows.push([key, "Fatura", b.name, "", b.amount, `vence dia ${b.dueDay}${b.paid ? " (paga)" : ""}`]);
     for (const d of m.debts) {
-      rows.push([key, "Dívida", d.name, "", d.installmentAmount, `${d.paidInstallments}/${d.totalInstallments} parcelas pagas`]);
+      const info = debtInfo(d, key);
+      const status = { agendada: "agendada", andamento: "em andamento", finalizada: "finalizada" }[info.status];
+      rows.push([
+        key,
+        "Dívida",
+        d.name,
+        "",
+        d.installmentAmount,
+        `${status} · ${monthYearLabel(info.start)} a ${monthYearLabel(info.end)} · ${d.totalInstallments} parcelas`,
+      ]);
     }
     for (const [cat, limit] of Object.entries(m.categoryLimits ?? {})) {
       if (CATEGORIES.includes(cat as never)) rows.push([key, "Meta de gasto", cat, cat, limit as number, ""]);
