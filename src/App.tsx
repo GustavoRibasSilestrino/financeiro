@@ -7,6 +7,7 @@ import { BillsSection } from "./components/BillsSection";
 import { CalendarView } from "./components/CalendarView";
 import { CategoryChart } from "./components/CategoryChart";
 import { DebtsSection } from "./components/DebtsSection";
+import { CategoryCompare } from "./components/CategoryCompare";
 import { ReserveTracker } from "./components/ReserveTracker";
 import { QuickAdd } from "./components/QuickAdd";
 import { ProjectionChart } from "./components/ProjectionChart";
@@ -25,7 +26,7 @@ import { useStore } from "./hooks/useStore";
 import { countableMonth } from "./lib/debts";
 import { mergeFromPrevious, previousMonthWithData } from "./lib/recurring";
 import { balance, expensesByCategory, totalIncome, totalOut } from "./lib/finance";
-import { effectiveCategoryLimits, effectiveReserve, getMonth, shiftMonthKey, shortLabelForMonthKey } from "./lib/storage";
+import { effectiveCategoryLimits, effectiveReserve, labelForMonthKey, getMonth, shiftMonthKey, shortLabelForMonthKey } from "./lib/storage";
 import type { Bill, Debt, Expense } from "./lib/types";
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
     month.expenses.length + month.bills.length + month.debts.length === 0 && month.income + month.extraIncome === 0;
   const calc = countableMonth(month, currentKey);
   const categories = expensesByCategory(calc);
+  const previousCategories = previousMonth ? expensesByCategory(countableMonth(previousMonth, previousKey)) : [];
 
   function setBillDueDay(id: string, day: number) {
     updateMonth((m) => ({ ...m, bills: m.bills.map((b) => (b.id === id ? { ...b, dueDay: day } : b)) }));
@@ -162,6 +164,9 @@ function App() {
               </div>
               <EvolutionChart data={history} />
               <CategoryChart data={categories} />
+              <div className="lg:col-span-2">
+                <CategoryCompare current={categories} previous={previousCategories} previousLabel={labelForMonthKey(previousKey)} />
+              </div>
             </div>
           )}
 
