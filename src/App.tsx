@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { CategoryBudgets } from "./components/CategoryBudgets";
+import { CopyMonthBanner } from "./components/CopyMonthBanner";
+import { DataTools } from "./components/DataTools";
+import { DueAlerts } from "./components/DueAlerts";
 import { BillsSection } from "./components/BillsSection";
 import { CalendarView } from "./components/CalendarView";
 import { CategoryChart } from "./components/CategoryChart";
@@ -16,12 +19,13 @@ import { MonthNote } from "./components/MonthNote";
 import { SpendingBar } from "./components/SpendingBar";
 import { NavTabs, type TabId } from "./components/NavTabs";
 import { useStore } from "./hooks/useStore";
+import { mergeFromPrevious, previousMonthWithData } from "./lib/recurring";
 import { balance, expensesByCategory, totalIncome, totalOut } from "./lib/finance";
 import { effectiveCategoryLimits, getMonth, shiftMonthKey, shortLabelForMonthKey } from "./lib/storage";
 import type { Bill, Debt, Expense } from "./lib/types";
 
 function App() {
-  const { store, month, currentKey, setCurrentKey, updateMonth } = useStore();
+  const { store, month, currentKey, setCurrentKey, updateMonth, replaceStore } = useStore();
   const [tab, setTab] = useState<TabId>("resumo");
 
   const previousKey = shiftMonthKey(currentKey, -1);
@@ -36,6 +40,9 @@ function App() {
   }
 
   const categoryLimits = effectiveCategoryLimits(store, currentKey);
+  const prevData = previousMonthWithData(store, currentKey);
+  const monthIsEmpty =
+    month.expenses.length + month.bills.length + month.debts.length === 0 && month.income + month.extraIncome === 0;
   const categories = expensesByCategory(month);
 
   function setBillDueDay(id: string, day: number) {
@@ -52,6 +59,10 @@ function App() {
         <main className="mt-5 sm:mt-8 space-y-4 sm:space-y-6">
           {tab === "resumo" && (
             <>
+              {monthIsEmpty && prevData && (
+                <CopyMonthBanner onCopy={() => prevData && updateMonth((m) => mergeFromPrevious(m, prevData))} />
+              )}
+              <DueAlerts currentKey={currentKey} bills={month.bills} />
               <Ledger month={month} previousBalance={previousBalance} />
               <SpendingBar month={month} />
               <IncomeCard
@@ -59,6 +70,7 @@ function App() {
                 onChange={(income, extraIncome) => updateMonth((m) => ({ ...m, income, extraIncome }))}
               />
               <MonthNote note={month.note} onChange={(note) => updateMonth((m) => ({ ...m, note }))} />
+              <DataTools store={store} onImport={replaceStore} />
             </>
           )}
 
@@ -89,6 +101,9 @@ function App() {
                 onRemove={(id) =>
                   updateMonth((m) => ({ ...m, expenses: m.expenses.filter((e) => e.id !== id) }))
                 }
+                onUpdate={(id, patch) =>
+                  updateMonth((m) => ({ ...m, expenses: m.expenses.map((e) => (e.id === id ? { ...e, ...patch } : e)) }))
+                }
               />
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
@@ -102,11 +117,17 @@ function App() {
                       bills: m.bills.map((b) => (b.id === id ? { ...b, paid: !b.paid } : b)),
                     }))
                   }
+                  onUpdate={(id, patch) =>
+                    updateMonth((m) => ({ ...m, bills: m.bills.map((b) => (b.id === id ? { ...b, ...patch } : b)) }))
+                  }
                 />
                 <DebtsSection
                   debts={month.debts}
                   onAdd={(debt: Debt) => updateMonth((m) => ({ ...m, debts: [...m.debts, debt] }))}
                   onRemove={(id) => updateMonth((m) => ({ ...m, debts: m.debts.filter((d) => d.id !== id) }))}
+                  onUpdate={(id, patch) =>
+                    updateMonth((m) => ({ ...m, debts: m.debts.map((d) => (d.id === id ? { ...d, ...patch } : d)) }))
+                  }
                   onAdvance={(id) =>
                     updateMonth((m) => ({
                       ...m,

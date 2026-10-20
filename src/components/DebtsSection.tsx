@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { EditRow } from "./EditRow";
 import { formatBRL } from "../lib/finance";
 import type { Debt } from "../lib/types";
 
@@ -7,12 +8,15 @@ interface Props {
   onAdd: (debt: Debt) => void;
   onRemove: (id: string) => void;
   onAdvance: (id: string) => void;
+  onUpdate: (id: string, patch: Partial<Debt>) => void;
 }
 
-export function DebtsSection({ debts, onAdd, onRemove, onAdvance }: Props) {
+export function DebtsSection({ debts, onAdd, onRemove, onAdvance, onUpdate }: Props) {
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [installments, setInstallments] = useState("");
+
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const activeDebts = debts.filter((d) => d.paidInstallments < d.totalInstallments);
   const total = activeDebts.reduce((s, d) => s + d.installmentAmount, 0);
@@ -89,6 +93,29 @@ export function DebtsSection({ debts, onAdd, onRemove, onAdvance }: Props) {
         {debts.length === 0 && <li className="text-ink-faint text-sm py-4">Nenhuma dívida cadastrada.</li>}
         {debts.map((d) => {
           const done = d.paidInstallments >= d.totalInstallments;
+          if (editingId === d.id) {
+            return (
+              <EditRow
+                key={d.id}
+                fields={[
+                  { key: "name", label: "O que é?", kind: "text" },
+                  { key: "amount", label: "Parcela", kind: "number", width: "w-24" },
+                  { key: "total", label: "Parcelas", kind: "number", width: "w-20" },
+                  { key: "paid", label: "Pagas", kind: "number", width: "w-20" },
+                ]}
+                initial={{ name: d.name, amount: String(d.installmentAmount), total: String(d.totalInstallments), paid: String(d.paidInstallments) }}
+                onCancel={() => setEditingId(null)}
+                onSave={(v) => {
+                  const n = Number(String(v.amount).replace(",", "."));
+                  const total = Math.max(Math.round(Number(v.total)) || 1, 1);
+                  const paid = Math.min(Math.max(Math.round(Number(v.paid)) || 0, 0), total);
+                  if (!String(v.name).trim() || !Number.isFinite(n) || n <= 0) return;
+                  onUpdate(d.id, { name: String(v.name).trim(), installmentAmount: n, totalInstallments: total, paidInstallments: paid });
+                  setEditingId(null);
+                }}
+              />
+            );
+          }
           return (
             <li key={d.id} className="flex flex-wrap items-center justify-between gap-2 py-3 group">
               <div className={`min-w-0 ${done ? "opacity-50" : ""}`}>
@@ -109,6 +136,15 @@ export function DebtsSection({ debts, onAdd, onRemove, onAdvance }: Props) {
                     paguei essa
                   </button>
                 )}
+                <button
+                  onClick={() => setEditingId(d.id)}
+                  className="text-ink-faint opacity-60 hover:opacity-100 hover:text-rust-dark transition-opacity cursor-pointer p-1.5 -m-1.5"
+                  aria-label="Editar"
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" />
+                  </svg>
+                </button>
                 <button
                   onClick={() => onRemove(d.id)}
                   className="text-ink-faint opacity-50 group-hover:opacity-100 hover:text-brick transition-opacity cursor-pointer p-1.5 -m-1.5 text-lg leading-none"

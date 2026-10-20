@@ -35,6 +35,7 @@ export interface Bill {
   amount: number;
   dueDay: number;
   paid: boolean;
+  recurring?: boolean;
 }
 
 export interface Debt {

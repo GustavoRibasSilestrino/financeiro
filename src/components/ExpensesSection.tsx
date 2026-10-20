@@ -1,18 +1,22 @@
 import { useState } from "react";
 import { formatBRL } from "../lib/finance";
+import { EditRow } from "./EditRow";
 import { CATEGORIES, type Category, type Expense } from "../lib/types";
 
 interface Props {
   expenses: Expense[];
   onAdd: (expense: Expense) => void;
   onRemove: (id: string) => void;
+  onUpdate: (id: string, patch: Partial<Expense>) => void;
 }
 
-export function ExpensesSection({ expenses, onAdd, onRemove }: Props) {
+export function ExpensesSection({ expenses, onAdd, onRemove, onUpdate }: Props) {
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState<Category>("Outros");
   const [fixed, setFixed] = useState(true);
+
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const total = expenses.reduce((s, e) => s + e.amount, 0);
 
@@ -104,7 +108,26 @@ export function ExpensesSection({ expenses, onAdd, onRemove }: Props) {
         {expenses.length === 0 && (
           <li className="text-ink-faint text-sm py-4">Nenhum gasto lançado ainda.</li>
         )}
-        {expenses.map((e) => (
+        {expenses.map((e) =>
+          editingId === e.id ? (
+            <EditRow
+              key={e.id}
+              fields={[
+                { key: "name", label: "Com o quê?", kind: "text" },
+                { key: "amount", label: "Valor", kind: "number", width: "w-24" },
+                { key: "category", label: "Categoria", kind: "select", options: CATEGORIES, width: "w-36" },
+                { key: "fixed", label: "fixo (todo mês)", kind: "check" },
+              ]}
+              initial={{ name: e.name, amount: String(e.amount), category: e.category, fixed: e.fixed }}
+              onCancel={() => setEditingId(null)}
+              onSave={(v) => {
+                const n = Number(String(v.amount).replace(",", "."));
+                if (!String(v.name).trim() || !Number.isFinite(n) || n <= 0) return;
+                onUpdate(e.id, { name: String(v.name).trim(), amount: n, category: v.category as Category, fixed: v.fixed === true });
+                setEditingId(null);
+              }}
+            />
+          ) : (
           <li key={e.id} className="flex flex-wrap items-center justify-between gap-2 py-3 group">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span
@@ -118,6 +141,15 @@ export function ExpensesSection({ expenses, onAdd, onRemove }: Props) {
             <div className="flex items-center gap-3">
               <span className="tabular-nums text-ink-soft">{formatBRL(e.amount)}</span>
               <button
+                onClick={() => setEditingId(e.id)}
+                className="text-ink-faint opacity-60 hover:opacity-100 hover:text-rust-dark transition-opacity cursor-pointer p-1.5 -m-1.5"
+                aria-label="Editar"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" />
+                </svg>
+              </button>
+              <button
                 onClick={() => onRemove(e.id)}
                 className="text-ink-faint opacity-50 group-hover:opacity-100 hover:text-brick transition-opacity cursor-pointer p-1.5 -m-1.5 text-lg leading-none"
                 aria-label="Remover"
@@ -126,7 +158,8 @@ export function ExpensesSection({ expenses, onAdd, onRemove }: Props) {
               </button>
             </div>
           </li>
-        ))}
+          )
+        )}
       </ul>
     </section>
   );
