@@ -1,6 +1,6 @@
 import { dailyBudget } from "../lib/budget";
 import { todayISO } from "../lib/dates";
-import { formatBRL } from "../lib/finance";
+import { formatBRL, totalIncome } from "../lib/finance";
 import { monthKey } from "../lib/storage";
 import type { MonthData } from "../lib/types";
 
@@ -13,7 +13,7 @@ interface Props {
 export function DailyBudget({ month, currentKey }: Props) {
   if (currentKey !== monthKey(new Date())) return null;
   const b = dailyBudget(month, currentKey, todayISO());
-  const hasIncome = b.free + b.variableSpent > 0 || month.income + month.extraIncome > 0 || (month.incomes?.length ?? 0) > 0;
+  const hasIncome = totalIncome(month) > 0;
 
   let pace: { text: string; tone: string } | null = null;
   if (b.usedShare !== null) {

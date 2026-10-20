@@ -9,6 +9,7 @@ import { CategoryChart } from "./components/CategoryChart";
 import { DebtsSection } from "./components/DebtsSection";
 import { CategoryCompare } from "./components/CategoryCompare";
 import { ReserveTracker } from "./components/ReserveTracker";
+import { IncomeSources } from "./components/IncomeSources";
 import { LockScreen } from "./components/LockScreen";
 import { PinSettings } from "./components/PinSettings";
 import { DailyBudget } from "./components/DailyBudget";
@@ -100,8 +101,10 @@ function App() {
               <SpendingBar month={calc} />
               <IncomeCard
                 month={month}
+                sourcesTotal={(month.incomes ?? []).reduce((sum, i) => sum + i.amount, 0)}
                 onChange={(income, extraIncome) => updateMonth((m) => ({ ...m, income, extraIncome }))}
               />
+              <IncomeSources incomes={month.incomes ?? []} onChange={(incomes) => updateMonth((m) => ({ ...m, incomes }))} />
               <MonthNote note={month.note} onChange={(note) => updateMonth((m) => ({ ...m, note }))} />
               <DataTools store={store} onImport={replaceStore} />
               <PinSettings onLock={() => setLocked(true)} />
@@ -199,6 +202,7 @@ function App() {
             <CalendarView
               currentKey={currentKey}
               bills={month.bills}
+              incomes={month.incomes ?? []}
               onAdd={(bill: Bill) => updateMonth((m) => ({ ...m, bills: [...m.bills, bill] }))}
               onRemove={(id) => updateMonth((m) => ({ ...m, bills: m.bills.filter((b) => b.id !== id) }))}
               onTogglePaid={(id) =>

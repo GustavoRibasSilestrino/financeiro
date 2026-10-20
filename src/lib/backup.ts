@@ -55,7 +55,11 @@ export function exportCsv(store: Store) {
     const m = store[key];
     if (m.income) rows.push([key, "Renda", "Salário / renda fixa", "", m.income, ""]);
     if (m.extraIncome) rows.push([key, "Renda", "Extras", "", m.extraIncome, ""]);
-    for (const e of m.expenses) rows.push([key, "Gasto", e.name, e.category, e.amount, e.fixed ? "fixo" : "variável"]);
+    for (const i of m.incomes ?? []) rows.push([key, "Renda", i.name, "", i.amount, `cai dia ${i.day}${i.recurring !== false ? " · todo mês" : ""}`]);
+    for (const e of m.expenses) {
+      const detail = [e.date, e.fixed ? "fixo" : "variável", (e.tags ?? []).map((t) => `#${t}`).join(" "), e.note].filter(Boolean).join(" · ");
+      rows.push([key, "Gasto", e.name, e.category, e.amount, detail]);
+    }
     for (const b of m.bills) rows.push([key, "Fatura", b.name, "", b.amount, `vence dia ${b.dueDay}${b.paid ? " (paga)" : ""}`]);
     for (const d of m.debts) {
       const info = debtInfo(d, key);

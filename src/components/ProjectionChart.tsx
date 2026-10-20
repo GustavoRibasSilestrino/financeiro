@@ -15,7 +15,7 @@ const MONTHS = 8;
 export function ProjectionChart({ month, currentKey }: Props) {
   const points = projectMonths(month, currentKey, MONTHS).map((p) => ({ ...p, label: shortLabelForMonthKey(p.key) }));
   const endings = debtEndings(month, currentKey);
-  const hasIncome = month.income + month.extraIncome > 0;
+  const hasIncome = points[0].income > 0;
   const nothing = points.every((p) => p.committed === 0);
 
   return (

@@ -25,7 +25,10 @@ export interface DebtEnding {
 export function projectMonths(month: MonthData, fromKey: string, count: number): ProjectionPoint[] {
   const fixed = month.expenses.filter((e) => e.fixed).reduce((s, e) => s + e.amount, 0);
   const bills = month.bills.filter((b) => b.recurring !== false).reduce((s, b) => s + b.amount, 0);
-  const income = month.income + month.extraIncome;
+  const income =
+    month.income +
+    month.extraIncome +
+    (month.incomes ?? []).filter((i) => i.recurring !== false).reduce((sum, i) => sum + i.amount, 0);
 
   return Array.from({ length: count }, (_, i) => {
     const key = shiftMonthKey(fromKey, i);

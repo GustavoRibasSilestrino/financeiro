@@ -5,9 +5,11 @@ import type { MonthData } from "../lib/types";
 interface Props {
   month: MonthData;
   onChange: (income: number, extraIncome: number) => void;
+  /** Sum of the extra income sources listed below the card. */
+  sourcesTotal?: number;
 }
 
-export function IncomeCard({ month, onChange }: Props) {
+export function IncomeCard({ month, onChange, sourcesTotal = 0 }: Props) {
   const [income, setIncome] = useState(String(month.income || ""));
   const [extra, setExtra] = useState(String(month.extraIncome || ""));
 
@@ -61,7 +63,7 @@ export function IncomeCard({ month, onChange }: Props) {
       <p className="text-sm text-ink-soft mt-5">
         Total no bolso:{" "}
         <span className="text-ink font-medium">
-          {formatBRL((Number(income.replace(",", ".")) || 0) + (Number(extra.replace(",", ".")) || 0))}
+          {formatBRL((Number(income.replace(",", ".")) || 0) + (Number(extra.replace(",", ".")) || 0) + sourcesTotal)}
         </span>
       </p>
     </section>

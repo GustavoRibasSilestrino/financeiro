@@ -14,8 +14,9 @@ export function previousMonthWithData(store: Store, key: string): MonthData | nu
  * Items that repeat on their own: fixed expenses, recurring bills and every debt (its dates decide if it counts).
  * With `all`, also brings variable expenses and one-off bills.
  */
-export function carryOver(prev: MonthData, key: string, all = false): Pick<MonthData, "expenses" | "bills" | "debts"> {
+export function carryOver(prev: MonthData, key: string, all = false): Required<Pick<MonthData, "expenses" | "bills" | "debts" | "incomes">> {
   return {
+    incomes: (prev.incomes ?? []).filter((i) => all || i.recurring !== false).map((i) => ({ ...i, id: crypto.randomUUID() })),
     expenses: prev.expenses
       .filter((e) => all || e.fixed)
       .map((e) => ({ ...e, id: crypto.randomUUID(), date: e.date ? sameDayIn(key, e.date) : undefined })),
@@ -35,7 +36,7 @@ export function materializeMonth(store: Store, key: string): Store {
   if (!prev) return store;
   const carried = carryOver(prev, key);
   const hasSomething =
-    prev.income > 0 || prev.extraIncome > 0 || carried.expenses.length + carried.bills.length + carried.debts.length > 0;
+    prev.income > 0 || prev.extraIncome > 0 || carried.expenses.length + carried.bills.length + carried.debts.length + carried.incomes.length > 0;
   if (!hasSomething) return store;
   return {
     ...store,
@@ -52,6 +53,7 @@ export function mergeFromPrevious(current: MonthData, prev: MonthData, key: stri
     ...current,
     income: current.income || prev.income,
     extraIncome: current.extraIncome || prev.extraIncome,
+    incomes: [...(current.incomes ?? []), ...missing(current.incomes ?? [], carried.incomes)],
     expenses: [...current.expenses, ...missing(current.expenses, carried.expenses)],
     bills: [...current.bills, ...missing(current.bills, carried.bills)],
     debts: [...current.debts, ...missing(current.debts, carried.debts)],

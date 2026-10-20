@@ -1,20 +1,21 @@
 import { useState } from "react";
 import { formatBRL } from "../lib/finance";
 import { daysInMonth, firstWeekdayOfMonth, monthKey } from "../lib/storage";
-import type { Bill } from "../lib/types";
+import type { Bill, IncomeSource } from "../lib/types";
 
 const WEEKDAYS = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
 
 interface Props {
   currentKey: string;
   bills: Bill[];
+  incomes: IncomeSource[];
   onAdd: (bill: Bill) => void;
   onRemove: (id: string) => void;
   onTogglePaid: (id: string) => void;
   onSetDueDay: (id: string, day: number) => void;
 }
 
-export function CalendarView({ currentKey, bills, onAdd, onRemove, onTogglePaid, onSetDueDay }: Props) {
+export function CalendarView({ currentKey, bills, incomes, onAdd, onRemove, onTogglePaid, onSetDueDay }: Props) {
   const total = daysInMonth(currentKey);
   const offset = firstWeekdayOfMonth(currentKey);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
@@ -29,6 +30,12 @@ export function CalendarView({ currentKey, bills, onAdd, onRemove, onTogglePaid,
   for (const b of bills) {
     const day = Math.min(Math.max(b.dueDay, 1), total);
     billsByDay.set(day, [...(billsByDay.get(day) ?? []), b]);
+  }
+
+  const incomesByDay = new Map<number, IncomeSource[]>();
+  for (const i of incomes) {
+    const day = Math.min(Math.max(i.day, 1), total);
+    incomesByDay.set(day, [...(incomesByDay.get(day) ?? []), i]);
   }
 
   function submitAdd(e: React.FormEvent) {
@@ -93,6 +100,15 @@ export function CalendarView({ currentKey, bills, onAdd, onRemove, onTogglePaid,
                 {day}
               </span>
               <div className="flex flex-col gap-1">
+                {(incomesByDay.get(day) ?? []).map((i) => (
+                  <span
+                    key={i.id}
+                    title={`${i.name} · ${formatBRL(i.amount)} — entrada`}
+                    className="text-[10px] leading-tight px-1.5 py-0.5 rounded-md truncate bg-sage-soft text-sage-dark"
+                  >
+                    + {i.name}
+                  </span>
+                ))}
                 {dayBills.map((b) => (
                   <span
                     key={b.id}
@@ -124,9 +140,15 @@ export function CalendarView({ currentKey, bills, onAdd, onRemove, onTogglePaid,
             <p className="font-display text-xl">Dia {selectedDay}</p>
 
             <ul className="mt-3 divide-y divide-dashed divide-line">
-              {(billsByDay.get(selectedDay) ?? []).length === 0 && (
+              {(billsByDay.get(selectedDay) ?? []).length === 0 && (incomesByDay.get(selectedDay) ?? []).length === 0 && (
                 <li className="text-ink-faint text-sm py-2">Nada vencendo nesse dia ainda.</li>
               )}
+              {(incomesByDay.get(selectedDay) ?? []).map((i) => (
+                <li key={i.id} className="flex items-center justify-between gap-2 py-2">
+                  <span className="truncate">+ {i.name}</span>
+                  <span className="tabular-nums text-sage-dark">{formatBRL(i.amount)}</span>
+                </li>
+              ))}
               {(billsByDay.get(selectedDay) ?? []).map((b) => (
                 <li key={b.id} className="flex flex-wrap items-center justify-between gap-2 py-2 group">
                   <div className="flex items-center gap-3 min-w-0">
