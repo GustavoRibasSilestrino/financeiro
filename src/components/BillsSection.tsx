@@ -81,7 +81,7 @@ export function BillsSection({ bills, onAdd, onRemove, onTogglePaid, onUpdate }:
         </label>
         <button
           type="submit"
-          className="text-sm bg-rust text-paper px-4 py-2 rounded-full hover:bg-rust-dark transition-colors cursor-pointer"
+          className="text-sm bg-rust text-white px-4 py-2 rounded-full hover:bg-rust-dark transition-colors cursor-pointer"
         >
           adicionar
         </button>

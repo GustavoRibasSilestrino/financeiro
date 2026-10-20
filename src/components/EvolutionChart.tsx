@@ -32,14 +32,14 @@ export function EvolutionChart({ data }: Props) {
       <div className="mt-6 h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 10, right: 8, left: 8, bottom: 0 }}>
-            <CartesianGrid vertical={false} stroke="#e2e5f1" strokeDasharray="4 4" />
+            <CartesianGrid vertical={false} stroke="var(--color-line)" strokeDasharray="4 4" />
             <XAxis
               dataKey="label"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#5b6180", fontSize: 12 }}
+              tick={{ fill: "var(--color-ink-soft)", fontSize: 12 }}
             />
-            <ReferenceLine y={0} stroke="#9298b3" />
+            <ReferenceLine y={0} stroke="var(--color-ink-faint)" />
             <Tooltip
               cursor={{ fill: "rgba(193, 98, 45, 0.08)" }}
               content={({ active, payload }) => {

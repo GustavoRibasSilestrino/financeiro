@@ -38,7 +38,7 @@ export function CategoryChart({ data }: Props) {
                   innerRadius={45}
                   outerRadius={70}
                   paddingAngle={2}
-                  stroke="#ffffff"
+                  stroke="var(--color-card)"
                   strokeWidth={2}
                 >
                   {data.map((_, i) => (

@@ -58,7 +58,7 @@ export function GoalTracker({ month, onSetGoal }: Props) {
             placeholder="0"
             inputMode="decimal"
           />
-          <button onClick={save} className="text-sm bg-rust text-paper px-3 py-1.5 rounded-full hover:bg-rust-dark transition-colors cursor-pointer whitespace-nowrap">
+          <button onClick={save} className="text-sm bg-rust text-white px-3 py-1.5 rounded-full hover:bg-rust-dark transition-colors cursor-pointer whitespace-nowrap">
             salvar
           </button>
         </div>

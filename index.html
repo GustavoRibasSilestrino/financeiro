@@ -17,6 +17,12 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <script>
+      try {
+        var t = localStorage.getItem("ninho.theme");
+        if (t === "dark" || t === "light") document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
     <title>Ninho — suas finanças</title>
   </head>
   <body>

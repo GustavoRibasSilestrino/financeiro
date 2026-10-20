@@ -26,8 +26,8 @@ export function MonthlySpendingChart({ data }: Props) {
           <div className="mt-6 h-64">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={data} margin={{ top: 10, right: 8, left: 8, bottom: 0 }}>
-                <CartesianGrid vertical={false} stroke="#e2e5f1" strokeDasharray="4 4" />
-                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "#5b6180", fontSize: 12 }} />
+                <CartesianGrid vertical={false} stroke="var(--color-line)" strokeDasharray="4 4" />
+                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "var(--color-ink-soft)", fontSize: 12 }} />
                 <Tooltip
                   cursor={{ fill: "rgba(109, 93, 252, 0.08)" }}
                   content={({ active, payload }) => {
