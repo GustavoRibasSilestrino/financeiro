@@ -14,6 +14,8 @@ export interface MonthPoint {
   key: string;
   label: string;
   balance: number;
+  income: number;
+  spent: number;
   goal: number;
 }
 

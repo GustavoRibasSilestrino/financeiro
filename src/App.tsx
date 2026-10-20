@@ -4,6 +4,7 @@ import { BillsSection } from "./components/BillsSection";
 import { CalendarView } from "./components/CalendarView";
 import { CategoryChart } from "./components/CategoryChart";
 import { DebtsSection } from "./components/DebtsSection";
+import { MonthlySpendingChart } from "./components/MonthlySpendingChart";
 import { EvolutionChart, type MonthPoint } from "./components/EvolutionChart";
 import { ExpensesSection } from "./components/ExpensesSection";
 import { GoalsHistory } from "./components/GoalsHistory";
@@ -15,7 +16,7 @@ import { MonthNote } from "./components/MonthNote";
 import { SpendingBar } from "./components/SpendingBar";
 import { NavTabs, type TabId } from "./components/NavTabs";
 import { useStore } from "./hooks/useStore";
-import { balance, expensesByCategory } from "./lib/finance";
+import { balance, expensesByCategory, totalIncome, totalOut } from "./lib/finance";
 import { effectiveCategoryLimits, getMonth, shiftMonthKey, shortLabelForMonthKey } from "./lib/storage";
 import type { Bill, Debt, Expense } from "./lib/types";
 
@@ -31,7 +32,7 @@ function App() {
   for (let i = 5; i >= 0; i--) {
     const key = shiftMonthKey(currentKey, -i);
     const m = getMonth(store, key);
-    history.push({ key, label: shortLabelForMonthKey(key), balance: balance(m), goal: m.goal });
+    history.push({ key, label: shortLabelForMonthKey(key), balance: balance(m), income: totalIncome(m), spent: totalOut(m), goal: m.goal });
   }
 
   const categoryLimits = effectiveCategoryLimits(store, currentKey);
@@ -122,7 +123,10 @@ function App() {
           )}
 
           {tab === "evolucao" && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              <div className="lg:col-span-2">
+                <MonthlySpendingChart data={history} />
+              </div>
               <EvolutionChart data={history} />
               <CategoryChart data={categories} />
             </div>
