@@ -1,4 +1,3 @@
-import { ThemeToggle } from "./ThemeToggle";
 import { labelForMonthKey, shiftMonthKey } from "../lib/storage";
 
 interface Props {
@@ -17,9 +16,7 @@ export function Header({ currentKey, onChange }: Props) {
         <h1 className="font-display font-extrabold text-2xl sm:text-4xl tracking-tight">Ninho</h1>
       </div>
 
-      <div className="flex items-center gap-2 shrink-0">
-      <ThemeToggle />
-      <div className="flex items-center bg-card border border-line rounded-full p-1 shadow-warm">
+      <div className="flex items-center bg-card border border-line rounded-full p-1 shadow-warm shrink-0">
         <button
           onClick={() => onChange(shiftMonthKey(currentKey, -1))}
           className="w-10 h-10 shrink-0 rounded-full grid place-content-center text-ink-soft hover:bg-paper-soft hover:text-ink active:bg-paper-soft transition-colors cursor-pointer text-lg"
@@ -37,7 +34,6 @@ export function Header({ currentKey, onChange }: Props) {
         >
           ›
         </button>
-      </div>
       </div>
     </header>
   );

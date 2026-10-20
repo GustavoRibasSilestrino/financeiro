@@ -4,36 +4,6 @@
   --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
   --font-body: "Inter", system-ui, sans-serif;
 
-  --color-paper: #f4f5fb;
-  --color-paper-soft: #e9ebf6;
-  --color-card: #ffffff;
-  --color-ink: #151933;
-  --color-ink-soft: #5b6180;
-  --color-ink-faint: #9298b3;
-  --color-line: #e2e5f1;
-
-  --color-rust: #6d5dfc;
-  --color-rust-dark: #4a3bd6;
-  --color-rust-soft: #e9e6ff;
-
-  --color-sage: #10b981;
-  --color-sage-dark: #059669;
-  --color-sage-soft: #d9f5ea;
-
-  --color-brick: #ef4468;
-  --color-brick-soft: #fde1e8;
-
-  --color-mustard: #f59e0b;
-  --color-mustard-soft: #fdefc9;
-}
-
-:root {
-  --glow-1: #e4e0ff;
-  --glow-2: #d9f5ea;
-}
-
-:root[data-theme="dark"] {
-  color-scheme: dark;
   --color-paper: #0f1226;
   --color-paper-soft: #20244a;
   --color-card: #181c36;
@@ -41,43 +11,26 @@
   --color-ink-soft: #a4a9c7;
   --color-ink-faint: #7a80a3;
   --color-line: #2a2f52;
+
   --color-rust: #7b6cff;
   --color-rust-dark: #b1a7ff;
   --color-rust-soft: #2a2556;
+
   --color-sage: #34d399;
   --color-sage-dark: #4ade9e;
   --color-sage-soft: #143a2f;
+
   --color-brick: #ff6b8a;
   --color-brick-soft: #3d1a28;
+
   --color-mustard: #fbbf24;
   --color-mustard-soft: #3b2f10;
-  --glow-1: #1d1a4a;
-  --glow-2: #0f2e2a;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --color-paper: #0f1226;
-    --color-paper-soft: #20244a;
-    --color-card: #181c36;
-    --color-ink: #eceefb;
-    --color-ink-soft: #a4a9c7;
-    --color-ink-faint: #7a80a3;
-    --color-line: #2a2f52;
-    --color-rust: #7b6cff;
-    --color-rust-dark: #b1a7ff;
-    --color-rust-soft: #2a2556;
-    --color-sage: #34d399;
-    --color-sage-dark: #4ade9e;
-    --color-sage-soft: #143a2f;
-    --color-brick: #ff6b8a;
-    --color-brick-soft: #3d1a28;
-    --color-mustard: #fbbf24;
-    --color-mustard-soft: #3b2f10;
-    --glow-1: #1d1a4a;
-    --glow-2: #0f2e2a;
-  }
+:root {
+  color-scheme: dark;
+  --glow-1: #1d1a4a;
+  --glow-2: #0f2e2a;
 }
 
 
