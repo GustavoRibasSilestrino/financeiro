@@ -72,3 +72,15 @@ function migrateDebts(store: Store): Store {
   }
   return store;
 }
+
+/** Latest emergency-fund figures at or before this month. */
+export function effectiveReserve(store: Store, key: string): { saved: number; months: number } {
+  let saved: number | undefined;
+  let months: number | undefined;
+  for (let i = 0; i <= 24 && (saved === undefined || months === undefined); i++) {
+    const m = store[shiftMonthKey(key, -i)];
+    if (saved === undefined && m?.reserveSaved !== undefined) saved = m.reserveSaved;
+    if (months === undefined && m?.reserveMonths !== undefined) months = m.reserveMonths;
+  }
+  return { saved: saved ?? 0, months: months ?? 6 };
+}

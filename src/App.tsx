@@ -7,6 +7,7 @@ import { BillsSection } from "./components/BillsSection";
 import { CalendarView } from "./components/CalendarView";
 import { CategoryChart } from "./components/CategoryChart";
 import { DebtsSection } from "./components/DebtsSection";
+import { ReserveTracker } from "./components/ReserveTracker";
 import { QuickAdd } from "./components/QuickAdd";
 import { ProjectionChart } from "./components/ProjectionChart";
 import { MonthlySpendingChart } from "./components/MonthlySpendingChart";
@@ -24,7 +25,7 @@ import { useStore } from "./hooks/useStore";
 import { countableMonth } from "./lib/debts";
 import { mergeFromPrevious, previousMonthWithData } from "./lib/recurring";
 import { balance, expensesByCategory, totalIncome, totalOut } from "./lib/finance";
-import { effectiveCategoryLimits, getMonth, shiftMonthKey, shortLabelForMonthKey } from "./lib/storage";
+import { effectiveCategoryLimits, effectiveReserve, getMonth, shiftMonthKey, shortLabelForMonthKey } from "./lib/storage";
 import type { Bill, Debt, Expense } from "./lib/types";
 
 function App() {
@@ -44,6 +45,11 @@ function App() {
   }
 
   const categoryLimits = effectiveCategoryLimits(store, currentKey);
+  const reserve = effectiveReserve(store, currentKey);
+  const spentMonths = history.filter((h) => h.spent > 0);
+  const avgSpend = spentMonths.length ? spentMonths.reduce((s, h) => s + h.spent, 0) / spentMonths.length : 0;
+  const recent = history.filter((h) => h.income > 0).slice(-3);
+  const avgSaving = recent.length ? recent.reduce((s, h) => s + h.balance, 0) / recent.length : 0;
   const prevData = previousMonthWithData(store, currentKey);
   const monthIsEmpty =
     month.expenses.length + month.bills.length + month.debts.length === 0 && month.income + month.extraIncome === 0;
@@ -82,6 +88,13 @@ function App() {
           {tab === "metas" && (
             <>
               <GoalTracker month={calc} onSetGoal={(goal) => updateMonth((m) => ({ ...m, goal }))} />
+              <ReserveTracker
+                saved={reserve.saved}
+                months={reserve.months}
+                avgSpend={avgSpend}
+                avgSaving={avgSaving}
+                onChange={(saved, months) => updateMonth((m) => ({ ...m, reserveSaved: saved, reserveMonths: months }))}
+              />
               <GoalsHistory data={[...history].reverse()} />
             </>
           )}

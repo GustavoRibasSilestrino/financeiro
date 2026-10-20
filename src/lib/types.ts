@@ -55,6 +55,9 @@ export interface MonthData {
   goal: number;
   note: string;
   categoryLimits?: CategoryLimits;
+  /** Emergency fund: amount saved so far and target in months of spending. Carried forward like category limits. */
+  reserveSaved?: number;
+  reserveMonths?: number;
   expenses: Expense[];
   bills: Bill[];
   debts: Debt[];
