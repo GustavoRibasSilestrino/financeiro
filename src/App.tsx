@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CategoryBudgets } from "./components/CategoryBudgets";
 import { CopyMonthBanner } from "./components/CopyMonthBanner";
 import { DataTools } from "./components/DataTools";
@@ -9,6 +9,8 @@ import { CategoryChart } from "./components/CategoryChart";
 import { DebtsSection } from "./components/DebtsSection";
 import { CategoryCompare } from "./components/CategoryCompare";
 import { ReserveTracker } from "./components/ReserveTracker";
+import { LockScreen } from "./components/LockScreen";
+import { PinSettings } from "./components/PinSettings";
 import { QuickAdd } from "./components/QuickAdd";
 import { ProjectionChart } from "./components/ProjectionChart";
 import { MonthlySpendingChart } from "./components/MonthlySpendingChart";
@@ -23,6 +25,7 @@ import { MonthNote } from "./components/MonthNote";
 import { SpendingBar } from "./components/SpendingBar";
 import { NavTabs, type TabId } from "./components/NavTabs";
 import { useStore } from "./hooks/useStore";
+import { hasPin } from "./lib/pin";
 import { countableMonth } from "./lib/debts";
 import { mergeFromPrevious, previousMonthWithData } from "./lib/recurring";
 import { balance, expensesByCategory, totalIncome, totalOut } from "./lib/finance";
@@ -32,6 +35,18 @@ import type { Bill, Debt, Expense } from "./lib/types";
 function App() {
   const { store, month, currentKey, setCurrentKey, updateMonth, replaceStore } = useStore();
   const [tab, setTab] = useState<TabId>("resumo");
+  const [locked, setLocked] = useState(hasPin);
+
+  // lock again when the user comes back after being away for a minute
+  useEffect(() => {
+    let hiddenAt = 0;
+    const onVisibility = () => {
+      if (document.hidden) hiddenAt = Date.now();
+      else if (hiddenAt && Date.now() - hiddenAt > 60_000 && hasPin()) setLocked(true);
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, []);
 
   const previousKey = shiftMonthKey(currentKey, -1);
   const previousMonth = store[previousKey];
@@ -62,6 +77,8 @@ function App() {
     updateMonth((m) => ({ ...m, bills: m.bills.map((b) => (b.id === id ? { ...b, dueDay: day } : b)) }));
   }
 
+  if (locked) return <LockScreen onUnlock={() => setLocked(false)} />;
+
   return (
     <div className="min-h-screen relative">
       <div className="paper-texture" aria-hidden />
@@ -84,6 +101,7 @@ function App() {
               />
               <MonthNote note={month.note} onChange={(note) => updateMonth((m) => ({ ...m, note }))} />
               <DataTools store={store} onImport={replaceStore} />
+              <PinSettings onLock={() => setLocked(true)} />
             </>
           )}
 
